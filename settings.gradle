@@ -1,0 +1,5 @@
+include ':auto-api'
+include ':app'
+rootProject.name = "Android-Auto"
+include ':core'
+include ':uiauto'

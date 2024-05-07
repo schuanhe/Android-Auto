@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">自动化小红书</string>
+    <string name="base_ser_desc">通过无障碍获取小红书关键词信息 by schuanhe</string>
+    <string name="fore_service">前台服务</string>
+</resources>
