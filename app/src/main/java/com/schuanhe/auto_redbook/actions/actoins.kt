@@ -1,6 +1,7 @@
 package com.schuanhe.auto_redbook.actions
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Path
 import android.graphics.RectF
 import android.os.Build
@@ -17,6 +18,8 @@ import android.widget.SeekBar
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.schuanhe.auto_redbook.*
 import com.schuanhe.auto.core.AutoApi
 import com.schuanhe.auto.core.api.*
@@ -41,6 +44,10 @@ class BaseNavigatorAction : Action() {
 
     override suspend fun run(act: ComponentActivity) {
         requireAutoService()
+
+        // 请求通知权限
+        requestNotificationPermission(act)
+
         toast("下拉通知栏..")
         pullNotificationBar()
         delay(1000)
@@ -65,6 +72,24 @@ class BaseNavigatorAction : Action() {
         DemoApp.INS.startActivity(Intent(DemoApp.INS, MainActivity::class.java).also {
             it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         })
+    }
+
+    private fun requestNotificationPermission(act: ComponentActivity) {
+        val permission = "${act.packageName}.permission.NOTIFICATION"
+        if (ContextCompat.checkSelfPermission(act, permission)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            // 如果权限尚未被授予，则向用户请求权限
+            ActivityCompat.requestPermissions(
+                act,
+                arrayOf(permission),
+                REQUEST_NOTIFICATION_PERMISSION
+            )
+        }
+    }
+
+    companion object {
+        private const val REQUEST_NOTIFICATION_PERMISSION = 1001
     }
 }
 

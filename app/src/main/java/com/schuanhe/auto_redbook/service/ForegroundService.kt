@@ -8,9 +8,11 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import com.schuanhe.andro_auto_api.requireBaseAccessibility
 import com.schuanhe.auto.core.api.back
 import com.schuanhe.auto.core.api.printLayoutInfo
 import com.schuanhe.auto_redbook.R
+import com.schuanhe.auto_redbook.api.redBookGo
 import com.schuanhe.auto_redbook.launchWithExpHandler
 import kotlinx.coroutines.delay
 
@@ -47,6 +49,12 @@ class ForegroundService : Service() {
         printIntent.action = ACTION_PRINT_LAYOUT
         val pi = PendingIntent.getService(this@ForegroundService, 0, printIntent, PendingIntent.FLAG_MUTABLE)
 
+        // 新按钮
+        val redBookGoIntent =  Intent(this@ForegroundService, ForegroundService::class.java)
+        redBookGoIntent.action = ACTION_RED_BOOK_GO
+        val redBookGoPendingIntent = PendingIntent.getService(this@ForegroundService, 0, redBookGoIntent, PendingIntent.FLAG_MUTABLE)
+
+
         setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         setSmallIcon(R.mipmap.ic_launcher_round)
         val acb = NotificationCompat.Action.Builder(0, "输出布局 on logcat", pi)
@@ -77,11 +85,20 @@ class ForegroundService : Service() {
                     printLayoutInfo()
                 }
             }
+            ACTION_RED_BOOK_GO -> {
+                launchWithExpHandler {
+                    requireBaseAccessibility()
+                    back()
+                    delay(1000)
+                    redBookGo()
+                }
+        }
         }
 
     }
 
     companion object {
         const val ACTION_PRINT_LAYOUT = "print_layout"
+        const val ACTION_RED_BOOK_GO = "red_book_go"
     }
 }

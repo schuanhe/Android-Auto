@@ -16,7 +16,8 @@ android {
     defaultConfig {
         applicationId "com.schuanhe.auto_redbook"
         minSdkVersion 21
-        targetSdkVersion 33
+        //noinspection ExpiredTargetSdkVersion
+        targetSdkVersion 32
         versionCode 1
         versionName "1.0"
 
