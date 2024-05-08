@@ -1,31 +1,52 @@
 package com.schuanhe.auto_redbook.api
 
+import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Path
+import androidx.core.content.ContextCompat
 import com.schuanhe.andro_auto_api.AccessibilityApi
 import com.schuanhe.andro_auto_api.requireBaseAccessibility
 import com.schuanhe.auto.core.api.gesture
 import com.schuanhe.auto.core.viewnode.ViewNode
+import com.schuanhe.auto_redbook.toast
 import kotlinx.coroutines.delay
 
 suspend fun redBookGo(includeInvisible: Boolean = true) {
     requireBaseAccessibility()
+
+
+
     search("搜索")
     delay(1000)
     input("测试关键词")
     search2()
     delay(3000)
-    val screenWidth = Resources.getSystem().displayMetrics.widthPixels
-    val screenHeight = Resources.getSystem().displayMetrics.heightPixels
 
-    // 创建从屏幕中心到屏幕中心的路径
-    val path = Path()
-    path.moveTo(screenWidth / 2f - 20, screenHeight / 2f)
-    path.lineTo(screenWidth / 2f - 20, screenHeight / 2f)
 
-    print("开始点击屏幕中心")
+    print("开始点击帖子")
     // 模拟点击
-    gesture(duration = 100L, path = path)
+    val ts0 = ViewNode.getRoot().findText(0, 0, "", "android.widget.ImageView")
+    if (ts0 != null) {
+        ts0.click()
+    }else{
+        println("没有找到")
+    }
+
+
+    delay(1000)
+    // 点击分享
+    print("开始点击分享")
+
+    val ts = ViewNode.getRoot().findDesc(0, 0, "分享")
+    ts?.click()
+    delay(1000)
+    //
+    print("开始点击复制链接")
+    val ts2 = ViewNode.getRoot().findDesc(0, 0, "复制链接")
+    ts2?.click()
+    delay(1000)
+
+
 }
 
 // 点击搜索
