@@ -1,51 +1,85 @@
 package com.schuanhe.auto_redbook.api
 
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Path
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import com.schuanhe.andro_auto_api.AccessibilityApi
 import com.schuanhe.andro_auto_api.requireBaseAccessibility
+import com.schuanhe.auto.core.api.click
 import com.schuanhe.auto.core.api.gesture
+import com.schuanhe.auto.core.api.setScreenSize
 import com.schuanhe.auto.core.viewnode.ViewNode
 import com.schuanhe.auto_redbook.toast
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 suspend fun redBookGo(includeInvisible: Boolean = true) {
     requireBaseAccessibility()
 
 
-
-    search("搜索")
+    // 点击搜索
+    delay(1000)
+    click(1100,120);
     delay(1000)
     input("测试关键词")
-    search2()
+    click(1150,150)
     delay(3000)
-
-
-    print("开始点击帖子")
-    // 模拟点击
-    val ts0 = ViewNode.getRoot().findText(0, 0, "", "android.widget.ImageView")
-    if (ts0 != null) {
-        ts0.click()
-    }else{
-        println("没有找到")
-    }
-
-
-    delay(1000)
+    // 点击帖子
+    click(300,800)
+    delay(3000)
     // 点击分享
-    print("开始点击分享")
-
-    val ts = ViewNode.getRoot().findDesc(0, 0, "分享")
-    ts?.click()
+    click(1150,150)
+    // 点击复制链接
     delay(1000)
-    //
-    print("开始点击复制链接")
-    val ts2 = ViewNode.getRoot().findDesc(0, 0, "复制链接")
-    ts2?.click()
-    delay(1000)
+    click(600,2400)
+    // 获取剪切板内容并弹出
 
+//
+//
+//    search("搜索")
+//    delay(1000)
+//    input("测试关键词")
+
+
+//    setScreenSize(500, 500)
+//     尝试点击
+//    delay(1000)
+//    click(763,316);
+//    print("开始点击搜索")
+
+//
+//    search2()
+//    delay(3000)
+//
+//
+//    print("开始点击帖子")
+//    // 模拟点击
+//    val ts0 = ViewNode.getRoot().findText(0, 0, "", "android.widget.ImageView")
+//    if (ts0 != null) {
+//        ts0.click()
+//    }else{
+//        println("没有找到")
+//    }
+//
+//
+//    delay(1000)
+//    // 点击分享
+//    print("开始点击分享")
+//
+//    val ts = ViewNode.getRoot().findDesc(0, 0, "分享")
+//    ts?.click()
+//    delay(1000)
+//    //
+//    print("开始点击复制链接")
+//    val ts2 = ViewNode.getRoot().findDesc(0, 0, "复制链接")
+//    ts2?.click()
+//    delay(1000)
+//
 
 }
 

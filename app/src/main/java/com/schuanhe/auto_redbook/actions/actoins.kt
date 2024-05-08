@@ -1,5 +1,8 @@
 package com.schuanhe.auto_redbook.actions
 
+import android.annotation.SuppressLint
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Path
@@ -28,6 +31,7 @@ import com.schuanhe.auto.core.utils.AdapterRectF
 import com.schuanhe.auto.core.utils.AutoGestureDescription
 import com.schuanhe.auto.core.utils.GestureResultCallback
 import com.schuanhe.auto.core.viewfinder.*
+import com.schuanhe.auto.core.viewnode.ViewNode
 import kotlinx.coroutines.*
 import timber.log.Timber
 import kotlin.coroutines.coroutineContext
@@ -91,6 +95,100 @@ class BaseNavigatorAction : Action() {
     companion object {
         private const val REQUEST_NOTIFICATION_PERMISSION = 1001
     }
+}
+
+class RedBookGo : Action() {
+    override val name: String
+        get() = "小红书自动化"
+
+    override suspend fun run(act: ComponentActivity) {
+
+        toast("正在打开小红书")
+        delay(1000)
+
+        val targetApp = "com.xingin.xhs"
+        act.startActivity(act.packageManager.getLaunchIntentForPackage(targetApp))
+
+        if (
+            waitForApp(targetApp, 5000).also {
+                toast("打开 " + if (it) "success" else "failed")
+            }
+        ) {
+
+            // 点击搜索
+            delay(1000)
+            toast("唤出搜索框")
+            click(1100,120);
+            delay(1000)
+            toast("输入关键词")
+            input("测试关键词")
+            delay(1000)
+            toast("点击搜索")
+            click(1150,150)
+            delay(3000)
+            // 点击帖子
+            toast("点击帖子")
+            click(300,800)
+            delay(3000)
+            // 点击分享
+            toast("点击分享")
+            click(1150,150)
+            // 点击复制链接
+            delay(1000)
+            toast("点击复制链接")
+            click(600,2400)
+            delay(2000)
+            val clipboardText = getClipboardText(act)
+            if (clipboardText != null) {
+                toast("复制的链接: $clipboardText")
+            } else {
+                toast("剪贴板为空或者无法获取内容")
+            }
+        }
+    }
+
+    @SuppressLint("ServiceCast")
+    private suspend fun getClipboardText(context: Context): String? {
+        return withContext(Dispatchers.Main) {
+            val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+            clipboardManager?.primaryClip?.getItemAt(0)?.text?.toString()
+        }
+    }
+}
+
+private fun input(keyword: String) {
+    val ts = ViewNode.getRoot().findText(0, 0, "", "android.widget.EditText")
+    if (ts != null) {
+        ts.focus()
+        ts.text = keyword
+    }else{
+        println("没有找到")
+    }
+}
+
+private fun ViewNode.findText(
+    index: Int,
+    dep: Int,
+    textKey: String,
+    byClassName : String
+): ViewNode? {
+    if (isVisibleToUser) {
+        if (text?.contains(textKey) == true || textKey == ""){
+            if (byClassName != ""){
+                if (className == byClassName)
+                    return this
+            }else{
+                return this
+            }
+        }
+    }
+    children.forEachIndexed { i, it ->
+        val foundNode = it?.findText(i, dep + 1, textKey, byClassName)
+        if (foundNode != null) {
+            return foundNode // 如果在子节点中找到了目标，立即返回该节点
+        }
+    }
+    return null // 如果当前节点及其子节点都不包含目标，则返回 null
 }
 
 class PickScreenText : Action() {

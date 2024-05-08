@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
 
         val actions = mutableListOf(
             BaseNavigatorAction(),
+            RedBookGo(),
             object : Action() {
                 override val name = "Stop"
                 override suspend fun run(act: ComponentActivity) {
