@@ -9,8 +9,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import com.schuanhe.andro_auto_api.AccessibilityApi
 import com.schuanhe.andro_auto_api.requireBaseAccessibility
+import com.schuanhe.auto.core.api.back
 import com.schuanhe.auto.core.api.click
 import com.schuanhe.auto.core.api.gesture
+import com.schuanhe.auto.core.api.scrollUp
 import com.schuanhe.auto.core.api.setScreenSize
 import com.schuanhe.auto.core.viewnode.ViewNode
 import com.schuanhe.auto_redbook.toast
@@ -37,7 +39,10 @@ suspend fun redBookGo(includeInvisible: Boolean = true) {
     // 点击复制链接
     delay(1000)
     click(600,2400)
-    // 获取剪切板内容并弹出
+    // 返回
+    back()
+    delay(1000)
+    scrollUp()
 
 //
 //

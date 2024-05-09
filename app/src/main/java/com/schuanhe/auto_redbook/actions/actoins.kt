@@ -104,65 +104,170 @@ class RedBookGo : Action() {
     override suspend fun run(act: ComponentActivity) {
 
         toast("正在打开小红书")
-        delay(1000)
+            delay(1000)
 
-        val targetApp = "com.xingin.xhs"
-        act.startActivity(act.packageManager.getLaunchIntentForPackage(targetApp))
+            val targetApp = "com.xingin.xhs"
+            act.startActivity(act.packageManager.getLaunchIntentForPackage(targetApp))
 
-        if (
-            waitForApp(targetApp, 5000).also {
-                toast("打开 " + if (it) "success" else "failed")
+            if (
+                waitForApp(targetApp, 1000).also {
+                    toast("打开小红书 " + if (it) "成功" else "失败")
+                }
+            ) {
+                pickScreenText(act)
+                // 点击帖子
+                delay(1000)
+                clickPostAndCopyLink(act,300,800)
+                // 返回
+                delay(1000)
+                back()
+                // 切换应用
+                switchApp(act, "com.schuanhe.auto_redbook")
+                delay(1000)
+
+                // 到主线再测试剪切板
+                val clipboardText = getClipboardText(act)
+                if (clipboardText != null) {
+                    toast("复制的链接: $clipboardText")
+                } else {
+                    toast("剪贴板为空或者无法获取内容")
+                }
+                switchApp(act, "com.xingin.xhs")
+                delay(1000)
+
+
+                // 点击帖子2
+                clickPostAndCopyLink(act,300,800)
+                delay(1000)
+                back()
+
+                // 切换应用
+                switchApp(act, "com.schuanhe.auto_redbook")
+                delay(1000)
+                // 到主线再测试剪切板
+                val clipboardText2 = getClipboardText(act)
+                if (clipboardText2 != null) {
+                    toast("复制的链接: $clipboardText2")
+                } else {
+                    toast("剪贴板为空或者无法获取内容")
+                }
+                switchApp(act, "com.xingin.xhs")
+                delay(1000)
+
+                // 上划
+                delay(1000)
+                toast("上划")
+                scrollUp()
+//                delay(1000)
+//                clickPostAndCopyLink(act,300,800)
+//                // 返回
+//                delay(1000)
+//                back()
+
+
             }
-        ) {
 
-            // 点击搜索
-            delay(1000)
-            toast("唤出搜索框")
-            click(1100,120);
-            delay(1000)
-            toast("输入关键词")
-            input("测试关键词")
-            delay(1000)
-            toast("点击搜索")
-            click(1150,150)
-            delay(3000)
-            // 点击帖子
-            toast("点击帖子")
-            click(300,800)
-            delay(3000)
-            // 点击分享
-            toast("点击分享")
-            click(1150,150)
-            // 点击复制链接
-            delay(1000)
-            toast("点击复制链接")
-            click(600,2400)
-            delay(2000)
-            val clipboardText = getClipboardText(act)
-            if (clipboardText != null) {
-                toast("复制的链接: $clipboardText")
-            } else {
-                toast("剪贴板为空或者无法获取内容")
-            }
-        }
+//
+//            // 点击搜索
+//            delay(1000)
+//            toast("唤出搜索框")
+//            click(1100,120);
+//            delay(1000)
+//            toast("输入关键词")
+//            input("测试关键词")
+//            delay(1000)
+//            toast("点击搜索")
+//            click(1150,150)
+//            delay(3000)
+//            // 点击帖子
+//            toast("点击帖子")
+//            click(300,800)
+//            delay(3000)
+//            // 点击分享
+//            toast("点击分享")
+//            click(1150,150)
+//            // 点击复制链接
+//            delay(1000)
+//            toast("点击复制链接")
+//            click(600,2400)
+//            delay(2000)
+//        val clipboardText = getClipboardText(act)
+//        if (clipboardText != null) {
+//            toast("复制的链接: $clipboardText")
+//        } else {
+//            toast("剪贴板为空或者无法获取内容")
+//        }
+//        }
     }
 
     @SuppressLint("ServiceCast")
     private suspend fun getClipboardText(context: Context): String? {
         return withContext(Dispatchers.Main) {
-            val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+            val clipboardManager =
+                context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
             clipboardManager?.primaryClip?.getItemAt(0)?.text?.toString()
+        }
+    }
+
+    // 搜索关键词
+    private suspend fun pickScreenText(act: ComponentActivity) {
+        toast("搜索")
+        click(1100, 120);
+        delay(2000)
+//        toast("输入关键词")
+        input("测试关键词")
+        delay(1000)
+//        toast("点击搜索")
+        click(1150, 150)
+        delay(3000)
+    }
+
+    // 点击帖子并复制链接
+    private suspend fun clickPostAndCopyLink(act: ComponentActivity,x: Int,y: Int){
+        // 点击帖子
+        toast("帖子处理")
+        click(x, y)
+        delay(3000)
+        // 点击分享
+//        toast("点击分享")
+        click(1150, 150)
+        // 点击复制链接
+        delay(1000)
+//        toast("点击复制链接")
+        click(600, 2400)
+        delay(2000)
+    }
+    // 将复制的链接转换为链接
+    private fun convertLink(urlText: String): String? {
+        val pattern = "https?://[a-z.]+/[a-zA-Z0-9]+".toRegex()
+        val matcher = pattern.find(urlText)
+        if (matcher == null) {
+            toast("无法解析链接")
+            return null
+        }
+        print("匹配到的链接: ${matcher.value}")
+        return matcher.value
+    }
+
+    // 切换应用
+    private suspend fun switchApp(act: ComponentActivity, targetApp: String) {
+        toast("正在打开$targetApp")
+        delay(1000)
+        act.startActivity(act.packageManager.getLaunchIntentForPackage(targetApp))
+        waitForApp(targetApp, 1000).also {
+            toast("打开$targetApp " + if (it) "成功" else "失败")
         }
     }
 }
 
-private fun input(keyword: String) {
+private suspend fun input(keyword: String) {
     val ts = ViewNode.getRoot().findText(0, 0, "", "android.widget.EditText")
     if (ts != null) {
         ts.focus()
         ts.text = keyword
-    }else{
-        println("没有找到")
+    } else {
+        println("没有找到android.widget.EditText,请在五秒内手动输入关键词")
+        delay(5000)
     }
 }
 
@@ -170,14 +275,14 @@ private fun ViewNode.findText(
     index: Int,
     dep: Int,
     textKey: String,
-    byClassName : String
+    byClassName: String
 ): ViewNode? {
     if (isVisibleToUser) {
-        if (text?.contains(textKey) == true || textKey == ""){
-            if (byClassName != ""){
+        if (text?.contains(textKey) == true || textKey == "") {
+            if (byClassName != "") {
                 if (className == byClassName)
                     return this
-            }else{
+            } else {
                 return this
             }
         }
@@ -207,7 +312,7 @@ class PickScreenText : Action() {
     }
 }
 
-class SiblingTestAction :Action() {
+class SiblingTestAction : Action() {
     override val name: String = "SiblingTest"
 
     override suspend fun run(act: ComponentActivity) {
@@ -236,12 +341,13 @@ class DrawableAction : Action() {
         // 指定点转路径手势
         if (!gesture(
                 2000L, arrayOf(
-                100 t 100,
-                100 t 200,
-                200 t 200,
-                200 t 100,
-                100 t 100
-            ))
+                    100 t 100,
+                    100 t 200,
+                    200 t 200,
+                    200 t 100,
+                    100 t 100
+                )
+            )
         ) {
             toast("打断")
         }
@@ -272,16 +378,22 @@ class DrawableAction : Action() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     private suspend fun scaleGesture() {
-        if (!gestures(800, arrayOf(
-                arrayOf(Pair(200, 200), Pair(100, 100)),
-                arrayOf(Pair(220, 220), Pair(300, 300)),
-            ))) {
+        if (!gestures(
+                800, arrayOf(
+                    arrayOf(Pair(200, 200), Pair(100, 100)),
+                    arrayOf(Pair(220, 220), Pair(300, 300)),
+                )
+            )
+        ) {
             toast("scaleGesture 失败")
         }
-        if (!gestures(800, arrayOf(
-                arrayOf(Pair(200, 200), Pair(100, 100)).reversedArray(),
-                arrayOf(Pair(220, 220), Pair(300, 300)).reversedArray(),
-            ))) {
+        if (!gestures(
+                800, arrayOf(
+                    arrayOf(Pair(200, 200), Pair(100, 100)).reversedArray(),
+                    arrayOf(Pair(220, 220), Pair(300, 300)).reversedArray(),
+                )
+            )
+        ) {
             toast("scaleGesture 失败")
         }
     }
@@ -493,7 +605,7 @@ class SmartFinderAction : Action() {
         sb.appendLine(s?.toString())
 
         (SF where text("1111") or text("2222")
-            and id("111") or longClickable()).findAll()
+                and id("111") or longClickable()).findAll()
 
 
         SF.where {
@@ -653,12 +765,14 @@ class InstrumentationInjectInputEventAction(
     override suspend fun run(act: ComponentActivity) {
         var t = SystemClock.uptimeMillis()
         repeat(100) {
-            val d = buildMotionEvent(t,
+            val d = buildMotionEvent(
+                t,
                 when (it) {
                     0 -> MotionEvent.ACTION_DOWN
                     99 -> MotionEvent.ACTION_UP
                     else -> MotionEvent.ACTION_MOVE
-                }, 100f, 5f * it)
+                }, 100f, 5f * it
+            )
             AutoApi.injectInputEvent(d, false)
             delay(10)
         }
@@ -728,7 +842,8 @@ class ContinueGestureAction(override val name: String = "ContinueGesture") : Act
         val stroke = AutoGestureDescription.StrokeDescription(p1, 0, 600, true)
         Timber.i("stroke id: ${stroke.id}")
         AutoApi.doGesturesAsync(
-            AutoGestureDescription.Builder().addStroke(stroke).build(), null, null)
+            AutoGestureDescription.Builder().addStroke(stroke).build(), null, null
+        )
         delay(2000)
 
         val p2 = Path().apply {
@@ -739,7 +854,8 @@ class ContinueGestureAction(override val name: String = "ContinueGesture") : Act
         val continueStroke = stroke.continueStroke(p2, 0, 600, false)
         Timber.i("continuedStrokeId: ${continueStroke.continuedStrokeId}")
         AutoApi.doGesturesAsync(
-            AutoGestureDescription.Builder().addStroke(continueStroke).build(), null, null)
+            AutoGestureDescription.Builder().addStroke(continueStroke).build(), null, null
+        )
         delay(1500)
     }
 }
