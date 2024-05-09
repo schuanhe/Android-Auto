@@ -1,13 +1,6 @@
 package com.schuanhe.auto_redbook.api
 
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
-import android.content.res.Resources
-import android.graphics.Path
-import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
-import com.schuanhe.andro_auto_api.AccessibilityApi
+
 import com.schuanhe.andro_auto_api.requireBaseAccessibility
 import com.schuanhe.auto.core.api.back
 import com.schuanhe.auto.core.api.click

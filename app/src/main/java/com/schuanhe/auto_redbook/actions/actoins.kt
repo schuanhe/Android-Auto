@@ -32,12 +32,13 @@ import com.schuanhe.auto.core.utils.AutoGestureDescription
 import com.schuanhe.auto.core.utils.GestureResultCallback
 import com.schuanhe.auto.core.viewfinder.*
 import com.schuanhe.auto.core.viewnode.ViewNode
+import com.schuanhe.auto_redbook.api.actAutoRedBook
 import kotlinx.coroutines.*
 import timber.log.Timber
 import kotlin.coroutines.coroutineContext
 
 /**
- * # actoins
+ * # actions
  *
  * Created on 2020/6/10
  * @author Vove
@@ -94,6 +95,16 @@ class BaseNavigatorAction : Action() {
 
     companion object {
         private const val REQUEST_NOTIFICATION_PERMISSION = 1001
+    }
+}
+
+class AutoRedBook : Action() {
+    override val name: String
+        get() = "小红书自动化 2版本"
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    override suspend fun run(act: ComponentActivity) {
+        actAutoRedBook(act)
     }
 }
 
@@ -212,7 +223,7 @@ class RedBookGo : Action() {
     // 搜索关键词
     private suspend fun pickScreenText(act: ComponentActivity) {
         toast("搜索")
-        click(1100, 120);
+        click(1100, 120)
         delay(2000)
 //        toast("输入关键词")
         input("测试关键词")
@@ -534,18 +545,18 @@ class ClickTextAction : Action() {
         get() = "点击文本"
 
     override suspend fun run(act: ComponentActivity) {
-        val edit_text = act.findViewById<EditText>(R.id.edit_text)
-        var targetText = edit_text.text.toString().trim()
+        val editText = act.findViewById<EditText>(R.id.edit_text)
+        var targetText = editText.text.toString().trim()
         if (targetText == "123456") {
             targetText = "文本匹配"
             withContext(Dispatchers.Main) {
-                edit_text.setText("文本匹配")
+                editText.setText("文本匹配")
             }
         }
         if (targetText.isEmpty()) {
             toast("请输入文本")
             withContext(Dispatchers.Main) {
-                edit_text.requestFocus()
+                editText.requestFocus()
             }
             return
         }

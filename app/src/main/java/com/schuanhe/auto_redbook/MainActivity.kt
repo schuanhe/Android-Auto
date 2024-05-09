@@ -12,6 +12,7 @@ import com.schuanhe.auto.core.AutoApi
 import com.schuanhe.auto.core.utils.jumpAccessibilityServiceSettings
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,6 +27,7 @@ class MainActivity : AppCompatActivity() {
         val actions = mutableListOf(
             BaseNavigatorAction(),
             RedBookGo(),
+            AutoRedBook(),
             object : Action() {
                 override val name = "Stop"
                 override suspend fun run(act: ComponentActivity) {
@@ -69,7 +71,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         if (actionJob?.isCompleted.let { it != null && !it }) {
-            toast("有正在运行的任务")
+            toast("请先停止当前任务")
             return
         }
         actionJob = launchWithExpHandler {
@@ -77,9 +79,9 @@ class MainActivity : AppCompatActivity() {
         }
         actionJob?.invokeOnCompletion {
             if (it is CancellationException) {
-                toast("取消执行")
+                Timber.tag("MainActivity").i("执行取消")
             } else if (it == null) {
-                toast("执行结束")
+                Timber.tag("MainActivity").i("执行完成")
             }
         }
     }
