@@ -171,7 +171,8 @@ suspend fun handleUrl(act: ComponentActivity) {
     } else {
         log("读取剪切板失败", 2)
     }
-    switchTask("小红书")
+//    switchTask("小红书")
+    openApp(act, "com.xingin.xhs")
     log("处理复制链接成功")
 }
 
