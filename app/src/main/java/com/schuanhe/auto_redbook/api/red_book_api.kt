@@ -1,41 +1,66 @@
 package com.schuanhe.auto_redbook.api
 
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.schuanhe.andro_auto_api.requireBaseAccessibility
 import com.schuanhe.auto.core.api.back
 import com.schuanhe.auto.core.api.click
 import com.schuanhe.auto.core.api.gesture
 import com.schuanhe.auto.core.api.scrollUp
 import com.schuanhe.auto.core.api.setScreenSize
+import com.schuanhe.auto.core.viewfinder.ConditionGroup
+import com.schuanhe.auto.core.viewfinder.SG
+import com.schuanhe.auto.core.viewfinder.matchText
 import com.schuanhe.auto.core.viewnode.ViewNode
 import com.schuanhe.auto_redbook.toast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
+@RequiresApi(Build.VERSION_CODES.N)
 suspend fun redBookGo(includeInvisible: Boolean = true) {
     requireBaseAccessibility()
 
+    val matchAll = listOf("^\\d{4}-\\d{2}-\\d{2}$",
+        "^\\d{2}-\\d{2}$",
+        "^\\d+天前$",
+        "^(昨|今)天 \\d{2}:\\d{2}$")
+    var listSG: ConditionGroup = SG()
+
+    matchAll.forEachIndexed { index, regex ->
+        listSG = if (index == 0) {
+            listSG.matchText(regex)
+        } else {
+            listSG.or().matchText(regex)
+        }
+    }
+
+    val list = listSG.findAll()
+    log("搜索结果：${list.size}")
+
+
+    list.last().swipeOffset(100,-20,400)
 
     // 点击搜索
-    delay(1000)
-    click(1100,120);
-    delay(1000)
-    input("测试关键词")
-    click(1150,150)
-    delay(3000)
-    // 点击帖子
-    click(300,800)
-    delay(3000)
-    // 点击分享
-    click(1150,150)
-    // 点击复制链接
-    delay(1000)
-    click(600,2400)
-    // 返回
-    back()
-    delay(1000)
-    scrollUp()
+//    delay(1000)
+//    click(1100,120);
+//    delay(1000)
+//    input("测试关键词")
+//    click(1150,150)
+//    delay(3000)
+//    // 点击帖子
+//    click(300,800)
+//    delay(3000)
+//    // 点击分享
+//    click(1150,150)
+//    // 点击复制链接
+//    delay(1000)
+//    click(600,2400)
+//    // 返回
+//    back()
+//    delay(1000)
+//    scrollUp()
 
 //
 //

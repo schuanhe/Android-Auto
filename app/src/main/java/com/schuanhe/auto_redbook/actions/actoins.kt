@@ -33,9 +33,18 @@ import com.schuanhe.auto.core.utils.GestureResultCallback
 import com.schuanhe.auto.core.viewfinder.*
 import com.schuanhe.auto.core.viewnode.ViewNode
 import com.schuanhe.auto_redbook.api.actAutoRedBook
+import com.schuanhe.auto_redbook.api.log
 import kotlinx.coroutines.*
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import timber.log.Timber
+import java.io.IOException
 import kotlin.coroutines.coroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /**
  * # actions
@@ -106,6 +115,44 @@ class AutoRedBook : Action() {
     override suspend fun run(act: ComponentActivity) {
         actAutoRedBook(act)
     }
+}
+
+class OKHttp : Action() {
+    override val name: String
+        get() = "使用okhttp完成网络请求"
+
+    override suspend fun run(act: ComponentActivity) {
+        // 使用协程来处理网络请求
+        val response = suspendCancellableCoroutine<Response> { continuation ->
+            // 构建请求
+            val request = Request.Builder()
+                .url("http://baidu.com") // 设置请求的URL
+                .build()
+
+            // 发送异步请求
+            val call = OkHttpClient().newCall(request)
+            call.enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    continuation.resume(response) // 在协程中恢复并传递响应结果
+                }
+
+                override fun onFailure(call: Call, e: IOException) {
+                    continuation.resumeWithException(e) // 在协程中恢复并传递异常
+                }
+            })
+        }
+
+        // 处理响应结果
+        if (response.isSuccessful) {
+            val responseBody = response.body?.string()
+            log("请求成功，响应码：${response.code}")
+            log("响应体：${responseBody}")
+            val responseData = responseBody
+            // 使用响应数据
+            // 例如，可以在这里更新UI
+        }
+    }
+
 }
 
 class RedBookGo : Action() {

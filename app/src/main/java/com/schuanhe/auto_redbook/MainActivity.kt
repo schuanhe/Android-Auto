@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
             BaseNavigatorAction(),
             RedBookGo(),
             AutoRedBook(),
+            OKHttp(),
             object : Action() {
                 override val name = "Stop"
                 override suspend fun run(act: ComponentActivity) {
