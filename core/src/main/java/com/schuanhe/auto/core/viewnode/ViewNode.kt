@@ -15,6 +15,7 @@ import com.schuanhe.auto.core.utils.ViewChildList
 import com.schuanhe.auto.core.viewfinder.AcsNode
 import com.schuanhe.auto.core.viewfinder.SmartFinder
 import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 import java.lang.Thread.sleep
 
 /**
@@ -327,6 +328,7 @@ class ViewNode : ViewOperation, Comparable<ViewNode> {
     @RequiresApi(Build.VERSION_CODES.N)
     override fun swipeOffset(dx: Int, dy: Int, delay: Int): Boolean {
         val c = ScreenAdapter.getRelPoint(getCenterPoint())
+        Timber.tag("swipeOffset").d("swipeOffset: c=${c.x},${c.y} = $c")
         return runBlocking {
             com.schuanhe.auto.core.api.swipe(c.x, c.y, c.x + dx, c.y + dy, delay)
         }

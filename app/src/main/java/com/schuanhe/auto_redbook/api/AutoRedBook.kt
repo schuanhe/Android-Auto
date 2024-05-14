@@ -1,47 +1,37 @@
 package com.schuanhe.auto_redbook.api
 
-import android.annotation.SuppressLint
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
-import com.schuanhe.andro_auto_api.requireBaseAccessibility
 import com.schuanhe.andro_auto_api.waitBaseAccessibility
 import com.schuanhe.auto.core.AutoApi
 import com.schuanhe.auto.core.api.back
 import com.schuanhe.auto.core.api.recents
-import com.schuanhe.auto.core.api.scrollUp
+import com.schuanhe.auto.core.api.setScreenSize
 import com.schuanhe.auto.core.api.waitForApp
-import com.schuanhe.auto.core.api.withId
-import com.schuanhe.auto.core.requireAutoService
 import com.schuanhe.auto.core.viewfinder.ConditionGroup
 import com.schuanhe.auto.core.viewfinder.SF
 import com.schuanhe.auto.core.viewfinder.SG
-import com.schuanhe.auto.core.viewfinder.checked
 import com.schuanhe.auto.core.viewfinder.clickable
-import com.schuanhe.auto.core.viewfinder.containsDesc
-import com.schuanhe.auto.core.viewfinder.containsText
 import com.schuanhe.auto.core.viewfinder.desc
 import com.schuanhe.auto.core.viewfinder.id
 import com.schuanhe.auto.core.viewfinder.matchText
-import com.schuanhe.auto.core.viewfinder.text
 import com.schuanhe.auto.core.viewfinder.type
 import com.schuanhe.auto.core.viewnode.ViewNode
-import com.schuanhe.auto_redbook.actions.Action
-import com.schuanhe.auto_redbook.toast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-var keyInterval = 0;
+var keyInterval = 0
 @RequiresApi(Build.VERSION_CODES.N)
 suspend fun actAutoRedBook(act: ComponentActivity) {
 
-    val keyString = listOf("关键词", "关键词2", "小红书2")
+    setScreenSize(100, 100)
+    val keyString = listOf("自动化", "关键词2", "小红书2")
 
     waitBaseAccessibility(60000)
     log("打开小红书")
@@ -61,38 +51,10 @@ suspend fun actAutoRedBook(act: ComponentActivity) {
 //    }
     searchInput(keyString)
 
-    delay(3000)
+    getListPost(act)
 
-    val matchAll = listOf("^\\d{4}-\\d{2}-\\d{2}$",
-        "^\\d{2}-\\d{2}$",
-        "^\\d+天前$",
-        "^(昨|今)天 \\d{2}:\\d{2}$")
-    var listSG: ConditionGroup = SG()
-
-    matchAll.forEachIndexed { index, regex ->
-        listSG = if (index == 0) {
-            listSG.matchText(regex)
-        } else {
-            listSG.or().matchText(regex)
-        }
-    }
-
-    val list = listSG.findAll()
-    log("搜索结果：${list.size}")
-    list.forEach {
-        log("开始处理[${it.text}]")
-        clickPost(it)
-        delay(1000)
-        // 处理链接
-        handleUrl(act)
-        delay(1000)
-        log("处理结束[${it.text}]")
-    }
-
-    // 下滑一手
-    scrollUp()
-
-
+    log("第二列")
+    getListPost(act)
 }
 
 // 打开应用
@@ -122,6 +84,42 @@ suspend fun searchInput(texts: List<String>) {
     }
 }
 
+// 获取列表帖子
+
+@RequiresApi(Build.VERSION_CODES.N)
+suspend fun getListPost(act: ComponentActivity) {
+    // 寻找列表
+    val matchAll = listOf("^\\d{4}-\\d{2}-\\d{2}$",
+        "^\\d{2}-\\d{2}$",
+        "^\\d+(天|小时|分钟)前$",
+        "^(昨|今)天 \\d{2}:\\d{2}$")
+    var listSG: ConditionGroup = SG()
+
+    matchAll.forEachIndexed { index, regex ->
+        listSG = if (index == 0) {
+            listSG.matchText(regex)
+        } else {
+            listSG.or().matchText(regex)
+        }
+    }
+
+    listSG.require(3000)
+    val list = listSG.findAll()
+    log("搜索结果：${list.size}")
+    list.forEach {
+        log("开始处理[${it.text}]")
+        clickPost(it)
+        delay(500)
+        // 处理链接
+        handleUrl(act)
+        delay(500)
+        log("处理结束[${it.text}]")
+    }
+
+    log("下滑")
+    list.last().swipeOffset(0,-50,300)
+}
+
 // 点击帖子
 suspend fun clickPost(it: ViewNode) {
     log("点击帖子[${it.text}]")
@@ -134,29 +132,40 @@ suspend fun clickPost(it: ViewNode) {
 
 // 获取帖子内容
 suspend fun getPostContent(){
-    // 作者
-    val author = SF.id("nickNameTV").require(2000).text
-    // 标题
-    val title = SF.id("g9x").require(2000).text
-    // 内容
-    val content = SF.id("dqo").require(2000).text
+    try {
+        // 作者
+        val author = SF.id("nickNameTV").require(2000).text
+        // 标题
+        val title = SF.id("g9x").require(2000).text
+        // 内容
+        val content = SF.id("dqo").require(2000).text
 
-    log("获取帖子内容:[作者:$author,标题:$title,内容:$content]")
+        log("获取帖子内容:[作者:$author,标题:$title,内容:$content]")
+    }catch (e: Exception){
+        log("获取帖子内容失败", 1)
+    }
 }
 
 // 复制url
 suspend fun copyUrl() {
-    log("点击分享")
-    if (!SF.desc("分享").require(2000).tryClick()) {
-        log("点击分享失败", 3)
+
+    try {
+        log("点击分享")
+        if (!SF.desc("分享").require(2000).tryClick()) {
+            log("点击分享失败", 3)
+            return
+        }
+        log("点击复制链接")
+        if (!SF.desc("复制链接").require(2000).childAt(0)?.click()!!) {
+            log("点击复制链接失败", 3)
+            return
+        }
+        log("复制链接成功")
+    }catch (e: Exception){
+        log("复制链接失败", 1)
         return
     }
-    log("点击复制链接")
-    if (!SF.desc("复制链接").require(2000).childAt(0)?.click()!!) {
-        log("点击复制链接失败", 3)
-        return
-    }
-    log("复制链接成功")
+
 }
 
 // 处理复制的url

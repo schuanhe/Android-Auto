@@ -4,19 +4,11 @@ package com.schuanhe.auto_redbook.api
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.schuanhe.andro_auto_api.requireBaseAccessibility
-import com.schuanhe.auto.core.api.back
-import com.schuanhe.auto.core.api.click
-import com.schuanhe.auto.core.api.gesture
-import com.schuanhe.auto.core.api.scrollUp
 import com.schuanhe.auto.core.api.setScreenSize
 import com.schuanhe.auto.core.viewfinder.ConditionGroup
 import com.schuanhe.auto.core.viewfinder.SG
 import com.schuanhe.auto.core.viewfinder.matchText
 import com.schuanhe.auto.core.viewnode.ViewNode
-import com.schuanhe.auto_redbook.toast
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 
 @RequiresApi(Build.VERSION_CODES.N)
 suspend fun redBookGo(includeInvisible: Boolean = true) {
@@ -24,7 +16,7 @@ suspend fun redBookGo(includeInvisible: Boolean = true) {
 
     val matchAll = listOf("^\\d{4}-\\d{2}-\\d{2}$",
         "^\\d{2}-\\d{2}$",
-        "^\\d+天前$",
+        "^\\d+(天|小时)前$",
         "^(昨|今)天 \\d{2}:\\d{2}$")
     var listSG: ConditionGroup = SG()
 
@@ -40,7 +32,10 @@ suspend fun redBookGo(includeInvisible: Boolean = true) {
     log("搜索结果：${list.size}")
 
 
-    list.last().swipeOffset(100,-20,400)
+    // 设置相对
+    setScreenSize(100, 100)
+    list.last().swipeOffset(0,-50,300)
+
 
     // 点击搜索
 //    delay(1000)
