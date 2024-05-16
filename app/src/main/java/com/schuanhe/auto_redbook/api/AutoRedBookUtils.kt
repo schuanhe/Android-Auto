@@ -35,7 +35,7 @@ suspend fun openApp(act: ComponentActivity, packageName: String): Boolean {
     // 等待应用启动，超时5秒
     return if (waitForApp(packageName, 5000)) {
         true
-    }else{
+    } else {
         log("打开应用【$packageName】失败, 结束脚本", 3)
         false
     }
@@ -81,10 +81,12 @@ suspend fun searchInputNoAndroid24(texts: List<String>) {
 @RequiresApi(Build.VERSION_CODES.N)
 suspend fun getListPost(act: ComponentActivity) {
     // 定义匹配规则，以适应不同时间格式的帖子列表项
-    val matchAll = listOf("^\\d{4}-\\d{2}-\\d{2}$",
+    val matchAll = listOf(
+        "^\\d{4}-\\d{2}-\\d{2}$",
         "^\\d{2}-\\d{2}$",
         "^\\d+(天|小时|分钟)前$",
-        "^(昨|今)天 \\d{2}:\\d{2}$")
+        "^(昨|今)天 \\d{2}:\\d{2}$"
+    )
     var listSG: ConditionGroup = SG()
 
     // 构建匹配条件
@@ -110,7 +112,7 @@ suspend fun getListPost(act: ComponentActivity) {
     }
 
     log("下滑")
-    list.last().swipeOffset(0,-50,300)
+    list.last().swipeOffset(0, -50, 300)
 }
 
 /**
@@ -120,10 +122,12 @@ suspend fun getListPost(act: ComponentActivity) {
  */
 suspend fun getListPostNoAndroid24(act: ComponentActivity) {
     // 寻找列表项并匹配时间格式
-    val matchAll = listOf("^\\d{4}-\\d{2}-\\d{2}$",
+    val matchAll = listOf(
+        "^\\d{4}-\\d{2}-\\d{2}$",
         "^\\d{2}-\\d{2}$",
         "^\\d+(天|小时|分钟)前$",
-        "^(昨|今)天 \\d{2}:\\d{2}$")
+        "^(昨|今)天 \\d{2}:\\d{2}$"
+    )
     var listSG: ConditionGroup = SG()
 
     matchAll.forEachIndexed { index, regex ->
@@ -157,10 +161,12 @@ suspend fun getListPostNoAndroid24(act: ComponentActivity) {
  */
 suspend fun clickPost(it: ViewNode) {
     log("点击帖子[${it.text}]")
-    if(it.tryClick()){
-        getPostContent()
-//        delay(500)
-        copyUrl()
+    if (it.tryClick()) {
+        // 判断是否进入详情成功
+        SF.desc("返回").require(2000).apply {
+            copyUrl()
+        }
+//        getPostContent()
     }
     // 判断当前页面
     log("当前页面: ${AutoApi.currentPage}")
@@ -198,24 +204,22 @@ suspend fun getPostContent() {
  * 复制url。
  */
 suspend fun copyUrl() {
-    try {
-        log("点击分享")
-        if (!SF.desc("分享").require(2000).tryClick()) {
-            log("点击分享失败", 3)
-            return
-        }
-        log("点击复制链接")
-        val copyLink = SF.desc("复制链接").require(1000)
-        if (copyLink.childAt(0)?.click() != true) {
-            if (!copyLink.tryClick()) {
-                log("点击复制链接失败", 3)
-                return
-            }
-        }
-        log("复制链接成功")
-    }catch (e: Exception){
-        log("复制链接失败", 1)
+    delay(1000)
+    log("点击分享")
+    if (!SF.desc("分享").require(2000).click()) {
+        log("点击分享失败", 3)
         return
+    }
+    log("点击复制链接")
+    var copyLink = SF.desc("复制链接").require(3000)
+
+    if (!copyLink.isClickable()) {
+        copyLink = copyLink.childAt(0)!!
+    }
+    try {
+        copyLink.tryClick()
+    } catch (e: Exception) {
+        log("点击复制链接失败", 3)
     }
 }
 
