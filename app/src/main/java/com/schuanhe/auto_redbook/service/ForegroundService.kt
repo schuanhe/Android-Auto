@@ -8,17 +8,12 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
-import com.schuanhe.andro_auto_api.requireBaseAccessibility
 import com.schuanhe.auto.core.api.back
 import com.schuanhe.auto.core.api.printLayoutInfo
 import com.schuanhe.auto_redbook.R
 import com.schuanhe.auto_redbook.api.redBookGo
 import com.schuanhe.auto_redbook.launchWithExpHandler
-import com.schuanhe.auto_redbook.toast
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 
 /**
  * # ForegroundService
@@ -92,11 +87,12 @@ class ForegroundService : Service() {
                 }
             }
             ACTION_RED_BOOK_GO -> {
-                launchWithExpHandler {
-                    back()
-                    delay(1000)
-                    redBookGo()
-                }
+                redBookGo(this)
+//                launchWithExpHandler {
+////                    back()
+////                    delay(1000)
+////
+////                }
         }
         }
 

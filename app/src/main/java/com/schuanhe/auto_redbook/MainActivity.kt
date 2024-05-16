@@ -6,10 +6,18 @@ import android.widget.ArrayAdapter
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import com.schuanhe.andro_auto_api.AccessibilityApi
-import com.schuanhe.auto_redbook.actions.*
-import com.schuanhe.auto_redbook.databinding.ActivityMainBinding
 import com.schuanhe.auto.core.AutoApi
 import com.schuanhe.auto.core.utils.jumpAccessibilityServiceSettings
+import com.schuanhe.auto_redbook.actions.Action
+import com.schuanhe.auto_redbook.actions.AutoRedBook
+import com.schuanhe.auto_redbook.actions.AutoRedBookNoAndroid24
+import com.schuanhe.auto_redbook.actions.BaseNavigatorAction
+import com.schuanhe.auto_redbook.actions.OKHttp
+import com.schuanhe.auto_redbook.actions.RedBookGo
+import com.schuanhe.auto_redbook.actions.showNo
+import com.schuanhe.auto_redbook.api.createNotificationChannel
+import com.schuanhe.auto_redbook.api.showNotification
+import com.schuanhe.auto_redbook.databinding.ActivityMainBinding
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import timber.log.Timber
@@ -24,11 +32,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        // 导入通知
+        createNotificationChannel(this)
+        // 显示通知showNotification
+        showNotification(this)
+
         val actions = mutableListOf(
             BaseNavigatorAction(),
             RedBookGo(),
             AutoRedBook(),
+            AutoRedBookNoAndroid24(),
             OKHttp(),
+            showNo(),
             object : Action() {
                 override val name = "Stop"
                 override suspend fun run(act: ComponentActivity) {

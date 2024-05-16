@@ -12,6 +12,7 @@
     <instrumentation
         android:name=".MyInstrumentation"
         android:targetPackage="${applicationId}" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
         android:name=".DemoApp"
         android:allowBackup="true"
@@ -30,6 +31,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".actions.YourActivity" />
         <activity android:name=".DrawableActivity" />
 
         <service

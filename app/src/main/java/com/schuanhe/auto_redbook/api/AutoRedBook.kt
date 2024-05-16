@@ -11,6 +11,7 @@ import com.schuanhe.auto.core.AutoApi
 import com.schuanhe.auto.core.api.back
 import com.schuanhe.auto.core.api.recents
 import com.schuanhe.auto.core.api.setScreenSize
+import com.schuanhe.auto.core.api.swipe
 import com.schuanhe.auto.core.api.waitForApp
 import com.schuanhe.auto.core.viewfinder.ConditionGroup
 import com.schuanhe.auto.core.viewfinder.SF
@@ -19,6 +20,7 @@ import com.schuanhe.auto.core.viewfinder.clickable
 import com.schuanhe.auto.core.viewfinder.desc
 import com.schuanhe.auto.core.viewfinder.id
 import com.schuanhe.auto.core.viewfinder.matchText
+import com.schuanhe.auto.core.viewfinder.text
 import com.schuanhe.auto.core.viewfinder.type
 import com.schuanhe.auto.core.viewnode.ViewNode
 import kotlinx.coroutines.Dispatchers
@@ -57,6 +59,35 @@ suspend fun actAutoRedBook(act: ComponentActivity) {
     getListPost(act)
 }
 
+suspend fun actAutoRedBookNoAndroid24(act: ComponentActivity) {
+
+    setScreenSize(100, 100)
+    val keyString = listOf("自动化", "关键词2", "小红书2")
+
+    waitBaseAccessibility(60000)
+    log("打开小红书")
+    if (!openApp(act, "com.xingin.xhs"))
+        return
+    log("打开搜索")
+    val searchElementFound = SF.desc("搜索").clickable().require(2000)
+    // 寻找搜索按钮
+    if (!searchElementFound.tryClick()) {
+        log("点击搜索按钮失败", 3)
+        return
+    }
+    // 寻找编辑框
+//    if (keyString.size < keyInterval){
+//        log("搜索完所有关键词")
+//        return
+//    }
+    searchInputNoAndroid24(keyString)
+
+    getListPostNoAndroid24(act)
+
+    log("第二列")
+    getListPostNoAndroid24(act)
+}
+
 // 打开应用
 suspend fun openApp(act: ComponentActivity,packageName: String): Boolean {
     act.startActivity(act.packageManager.getLaunchIntentForPackage(packageName))
@@ -81,6 +112,15 @@ suspend fun searchInput(texts: List<String>) {
             AutoApi.sendKeyCode(KeyEvent.KEYCODE_ENTER)
         }
 
+    }
+}
+
+suspend fun searchInputNoAndroid24(texts: List<String>) {
+    SF.type("EditText").require(3000).apply {
+        tryClick()
+        this.text = texts[keyInterval]
+//        keyInterval ++
+        SF.text("搜索").require(2000).tryClick()
     }
 }
 
@@ -120,6 +160,42 @@ suspend fun getListPost(act: ComponentActivity) {
     list.last().swipeOffset(0,-50,300)
 }
 
+suspend fun getListPostNoAndroid24(act: ComponentActivity) {
+    // 寻找列表
+    val matchAll = listOf("^\\d{4}-\\d{2}-\\d{2}$",
+        "^\\d{2}-\\d{2}$",
+        "^\\d+(天|小时|分钟)前$",
+        "^(昨|今)天 \\d{2}:\\d{2}$")
+    var listSG: ConditionGroup = SG()
+
+    matchAll.forEachIndexed { index, regex ->
+        listSG = if (index == 0) {
+            listSG.matchText(regex)
+        } else {
+            listSG.or().matchText(regex)
+        }
+    }
+
+    listSG.require(3000)
+    val list = listSG.findAll()
+    log("搜索结果：${list.size}")
+    list.forEach {
+        log("开始处理[${it.text}]")
+        clickPost(it)
+        delay(500)
+        // 处理链接
+        handleUrlNoAndroid24(act)
+        delay(500)
+        log("处理结束[${it.text}]")
+    }
+
+    log("下滑")
+//    list.last().swipeOffset(0,-50,300)
+    swipe(50, 20, 50, 50, 400)
+
+}
+
+
 // 点击帖子
 suspend fun clickPost(it: ViewNode) {
     log("点击帖子[${it.text}]")
@@ -156,9 +232,12 @@ suspend fun copyUrl() {
             return
         }
         log("点击复制链接")
-        if (!SF.desc("复制链接").require(2000).childAt(0)?.click()!!) {
-            log("点击复制链接失败", 3)
-            return
+        val copyLink = SF.desc("复制链接").require(2000)
+        if (copyLink.childAt(0)?.click() != true) {
+            if (!copyLink.tryClick()) {
+                log("点击复制链接失败", 3)
+                return
+            }
         }
         log("复制链接成功")
     }catch (e: Exception){
@@ -184,6 +263,24 @@ suspend fun handleUrl(act: ComponentActivity) {
     openApp(act, "com.xingin.xhs")
     log("处理复制链接成功")
 }
+
+suspend fun handleUrlNoAndroid24(act: ComponentActivity) {
+    log("开始处理复制链接")
+//    switchTask("自动化小红书")
+    val clipboardText = getClipboardText(act)
+    if (clipboardText != null) {
+        log("读取剪切板成功:[$clipboardText]")
+        val link = convertLink(clipboardText)
+        log("处理链接成功:[$link]")
+    } else {
+        log("读取剪切板失败", 2)
+    }
+//    switchTask("小红书")
+//    openApp(act, "com.xingin.xhs")
+    log("处理复制链接成功")
+}
+
+
 
 suspend fun switchTask(appName: String){
     log("切换任务[$appName]")

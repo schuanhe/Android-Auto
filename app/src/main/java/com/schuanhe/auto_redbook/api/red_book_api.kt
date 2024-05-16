@@ -1,40 +1,55 @@
 package com.schuanhe.auto_redbook.api
 
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import com.schuanhe.andro_auto_api.requireBaseAccessibility
-import com.schuanhe.auto.core.api.setScreenSize
-import com.schuanhe.auto.core.viewfinder.ConditionGroup
-import com.schuanhe.auto.core.viewfinder.SG
-import com.schuanhe.auto.core.viewfinder.matchText
+import android.app.AlertDialog
+import android.content.Context
+import android.content.DialogInterface
 import com.schuanhe.auto.core.viewnode.ViewNode
 
-@RequiresApi(Build.VERSION_CODES.N)
-suspend fun redBookGo(includeInvisible: Boolean = true) {
-    requireBaseAccessibility()
 
-    val matchAll = listOf("^\\d{4}-\\d{2}-\\d{2}$",
-        "^\\d{2}-\\d{2}$",
-        "^\\d+(天|小时)前$",
-        "^(昨|今)天 \\d{2}:\\d{2}$")
-    var listSG: ConditionGroup = SG()
+//@RequiresApi(Build.VERSION_CODES.N)
+fun redBookGo(context: Context,includeInvisible: Boolean = true) {
 
-    matchAll.forEachIndexed { index, regex ->
-        listSG = if (index == 0) {
-            listSG.matchText(regex)
-        } else {
-            listSG.or().matchText(regex)
-        }
+
+    showNotification(context)
+
+    val builder = AlertDialog.Builder(context)
+    builder.setTitle("提示")
+    builder.setMessage("这是一个对话框的示例")
+    builder.setPositiveButton("确定") { dialogInterface: DialogInterface, i: Int ->
+        // 点击确定按钮的处理逻辑
+//        Toast.makeText(context, "点击了确定按钮", Toast.LENGTH_SHORT).show()
     }
+    builder.setNegativeButton("取消") { dialogInterface: DialogInterface, i: Int ->
+        // 点击取消按钮的处理逻辑
+//        Toast.makeText(context, "点击了取消按钮", Toast.LENGTH_SHORT).show()
+    }
+    builder.show()
 
-    val list = listSG.findAll()
-    log("搜索结果：${list.size}")
 
-
-    // 设置相对
-    setScreenSize(100, 100)
-    list.last().swipeOffset(0,-50,300)
+//    requireBaseAccessibility()
+//
+//    val matchAll = listOf("^\\d{4}-\\d{2}-\\d{2}$",
+//        "^\\d{2}-\\d{2}$",
+//        "^\\d+(天|小时)前$",
+//        "^(昨|今)天 \\d{2}:\\d{2}$")
+//    var listSG: ConditionGroup = SG()
+//
+//    matchAll.forEachIndexed { index, regex ->
+//        listSG = if (index == 0) {
+//            listSG.matchText(regex)
+//        } else {
+//            listSG.or().matchText(regex)
+//        }
+//    }
+//
+//    val list = listSG.findAll()
+//    log("搜索结果：${list.size}")
+//
+//
+//    // 设置相对
+//    setScreenSize(100, 100)
+//    list.last().swipeOffset(0,-50,300)
 
 
     // 点击搜索

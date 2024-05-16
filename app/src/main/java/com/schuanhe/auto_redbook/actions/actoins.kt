@@ -23,18 +23,65 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.schuanhe.auto_redbook.*
 import com.schuanhe.auto.core.AutoApi
-import com.schuanhe.auto.core.api.*
+import com.schuanhe.auto.core.api.back
+import com.schuanhe.auto.core.api.click
+import com.schuanhe.auto.core.api.editor
+import com.schuanhe.auto.core.api.findAllWith
+import com.schuanhe.auto.core.api.gesture
+import com.schuanhe.auto.core.api.gestureAsync
+import com.schuanhe.auto.core.api.gestures
+import com.schuanhe.auto.core.api.home
+import com.schuanhe.auto.core.api.matchesText
+import com.schuanhe.auto.core.api.powerDialog
+import com.schuanhe.auto.core.api.printLayoutInfo
+import com.schuanhe.auto.core.api.pullNotificationBar
+import com.schuanhe.auto.core.api.quickSettings
+import com.schuanhe.auto.core.api.recents
+import com.schuanhe.auto.core.api.scrollUp
+import com.schuanhe.auto.core.api.setScreenSize
+import com.schuanhe.auto.core.api.waitForApp
+import com.schuanhe.auto.core.api.withId
+import com.schuanhe.auto.core.api.withText
+import com.schuanhe.auto.core.api.withType
 import com.schuanhe.auto.core.requireAutoService
 import com.schuanhe.auto.core.utils.AdapterRectF
 import com.schuanhe.auto.core.utils.AutoGestureDescription
 import com.schuanhe.auto.core.utils.GestureResultCallback
-import com.schuanhe.auto.core.viewfinder.*
+import com.schuanhe.auto.core.viewfinder.SF
+import com.schuanhe.auto.core.viewfinder.SG
+import com.schuanhe.auto.core.viewfinder.ScreenTextFinder
+import com.schuanhe.auto.core.viewfinder._desc
+import com.schuanhe.auto.core.viewfinder._text
+import com.schuanhe.auto.core.viewfinder.clickable
+import com.schuanhe.auto.core.viewfinder.containsText
+import com.schuanhe.auto.core.viewfinder.desc
+import com.schuanhe.auto.core.viewfinder.editable
+import com.schuanhe.auto.core.viewfinder.id
+import com.schuanhe.auto.core.viewfinder.longClickable
+import com.schuanhe.auto.core.viewfinder.matchText
+import com.schuanhe.auto.core.viewfinder.scrollable
+import com.schuanhe.auto.core.viewfinder.similarityText
+import com.schuanhe.auto.core.viewfinder.text
+import com.schuanhe.auto.core.viewfinder.textOrDesc
+import com.schuanhe.auto.core.viewfinder.type
 import com.schuanhe.auto.core.viewnode.ViewNode
+import com.schuanhe.auto_redbook.DemoApp
+import com.schuanhe.auto_redbook.DrawableActivity
+import com.schuanhe.auto_redbook.MainActivity
+import com.schuanhe.auto_redbook.R
 import com.schuanhe.auto_redbook.api.actAutoRedBook
+import com.schuanhe.auto_redbook.api.actAutoRedBookNoAndroid24
 import com.schuanhe.auto_redbook.api.log
-import kotlinx.coroutines.*
+import com.schuanhe.auto_redbook.api.showNotification
+import com.schuanhe.auto_redbook.toast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -116,7 +163,14 @@ class AutoRedBook : Action() {
         actAutoRedBook(act)
     }
 }
-
+class AutoRedBookNoAndroid24 : Action() {
+    override val name: String
+        get() = "小红书自动化 2(低于Android 24)"
+    @RequiresApi(Build.VERSION_CODES.N)
+    override suspend fun run(act: ComponentActivity) {
+        actAutoRedBookNoAndroid24(act)
+    }
+}
 class OKHttp : Action() {
     override val name: String
         get() = "使用okhttp完成网络请求"
@@ -151,6 +205,16 @@ class OKHttp : Action() {
             // 使用响应数据
             // 例如，可以在这里更新UI
         }
+    }
+
+}
+
+class showNo : Action() {
+    override val name: String
+        get() = "显示通知"
+
+    override suspend fun run(act: ComponentActivity) {
+        showNotification(act)
     }
 
 }
