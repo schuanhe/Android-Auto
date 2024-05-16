@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Intent
 import android.os.Build
 import com.schuanhe.andro_auto_api.AccessibilityApi
+import com.schuanhe.auto.core.AppScope
 import com.schuanhe.auto_redbook.service.AppAccessibilityService
 import com.schuanhe.auto_redbook.service.ForegroundService
 import timber.log.Timber
@@ -17,8 +18,10 @@ import timber.log.Timber
  * @author Vove
  */
 class DemoApp : Application() {
+
     companion object {
         lateinit var INS: Application
+        lateinit var PageUpdate: AppScope
     }
 
     override fun onCreate() {

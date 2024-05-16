@@ -87,12 +87,12 @@ class ForegroundService : Service() {
                 }
             }
             ACTION_RED_BOOK_GO -> {
-                redBookGo(this)
-//                launchWithExpHandler {
-////                    back()
-////                    delay(1000)
-////
-////                }
+
+                launchWithExpHandler {
+                    back()
+                    delay(1000)
+                    redBookGo()
+                }
         }
         }
 

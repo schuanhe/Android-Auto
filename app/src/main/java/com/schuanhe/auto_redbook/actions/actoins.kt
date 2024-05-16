@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Path
 import android.graphics.RectF
+import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
 import android.util.Log
@@ -70,10 +71,9 @@ import com.schuanhe.auto_redbook.DemoApp
 import com.schuanhe.auto_redbook.DrawableActivity
 import com.schuanhe.auto_redbook.MainActivity
 import com.schuanhe.auto_redbook.R
-import com.schuanhe.auto_redbook.api.actAutoRedBook
 import com.schuanhe.auto_redbook.api.actAutoRedBookNoAndroid24
-import com.schuanhe.auto_redbook.api.log
 import com.schuanhe.auto_redbook.api.showNotification
+import com.schuanhe.auto_redbook.log
 import com.schuanhe.auto_redbook.toast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -160,7 +160,22 @@ class AutoRedBook : Action() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     override suspend fun run(act: ComponentActivity) {
-        actAutoRedBook(act)
+//        actAutoRedBook(act)
+//        val url = "xhsdiscover://search/result?keyword=test"
+        val url = "xhsdiscover://item/662b2fea000000001c009fbc"
+
+        // 创建Intent对象
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse(url)
+        }
+
+        // 检查是否有应用能够处理这个Intent
+        if (intent.resolveActivity(act.packageManager) != null) {
+            // 启动对应的Activity
+            act.startActivity(intent)
+        } else {
+
+        }
     }
 }
 class AutoRedBookNoAndroid24 : Action() {
@@ -171,6 +186,8 @@ class AutoRedBookNoAndroid24 : Action() {
         actAutoRedBookNoAndroid24(act)
     }
 }
+
+
 class OKHttp : Action() {
     override val name: String
         get() = "使用okhttp完成网络请求"

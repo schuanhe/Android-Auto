@@ -1,32 +1,16 @@
 package com.schuanhe.auto_redbook.api
 
-import android.content.ClipboardManager
-import android.content.Context
 import android.os.Build
-import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import com.schuanhe.andro_auto_api.waitBaseAccessibility
-import com.schuanhe.auto.core.AutoApi
-import com.schuanhe.auto.core.api.back
-import com.schuanhe.auto.core.api.recents
 import com.schuanhe.auto.core.api.setScreenSize
-import com.schuanhe.auto.core.api.swipe
-import com.schuanhe.auto.core.api.waitForApp
-import com.schuanhe.auto.core.viewfinder.ConditionGroup
 import com.schuanhe.auto.core.viewfinder.SF
-import com.schuanhe.auto.core.viewfinder.SG
 import com.schuanhe.auto.core.viewfinder.clickable
 import com.schuanhe.auto.core.viewfinder.desc
-import com.schuanhe.auto.core.viewfinder.id
-import com.schuanhe.auto.core.viewfinder.matchText
-import com.schuanhe.auto.core.viewfinder.text
-import com.schuanhe.auto.core.viewfinder.type
-import com.schuanhe.auto.core.viewnode.ViewNode
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-import timber.log.Timber
+import com.schuanhe.auto_redbook.log
+import com.schuanhe.auto_redbook.openScheme
+import com.schuanhe.auto_redbook.scheme.RedBook
 
 var keyInterval = 0
 @RequiresApi(Build.VERSION_CODES.N)
@@ -60,27 +44,14 @@ suspend fun actAutoRedBook(act: ComponentActivity) {
 }
 
 suspend fun actAutoRedBookNoAndroid24(act: ComponentActivity) {
-
     setScreenSize(100, 100)
     val keyString = listOf("自动化", "关键词2", "小红书2")
-
     waitBaseAccessibility(60000)
-    log("打开小红书")
-    if (!openApp(act, "com.xingin.xhs"))
-        return
-    log("打开搜索")
-    val searchElementFound = SF.desc("搜索").clickable().require(2000)
-    // 寻找搜索按钮
-    if (!searchElementFound.tryClick()) {
-        log("点击搜索按钮失败", 3)
-        return
-    }
-    // 寻找编辑框
-//    if (keyString.size < keyInterval){
-//        log("搜索完所有关键词")
-//        return
-//    }
-    searchInputNoAndroid24(keyString)
+
+    log("使用Scheme搜索关键词: ${keyString[keyInterval]}")
+
+    openScheme(RedBook.xhsSearchWithKeyword(keyString[keyInterval]))
+
 
     getListPostNoAndroid24(act)
 
@@ -89,248 +60,3 @@ suspend fun actAutoRedBookNoAndroid24(act: ComponentActivity) {
 }
 
 // 打开应用
-suspend fun openApp(act: ComponentActivity,packageName: String): Boolean {
-    act.startActivity(act.packageManager.getLaunchIntentForPackage(packageName))
-    return if (waitForApp(packageName, 5000)) {
-        true
-    }else{
-        log("打开应用【$packageName】失败, 结束脚本", 3)
-        false
-    }
-}
-
-// 寻找编辑框并且输入内容
-suspend fun searchInput(texts: List<String>) {
-    SF.type("EditText").require(2000).apply {
-        this.text = texts[keyInterval]
-//        keyInterval ++
-        tryClick()
-        delay(300)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            sendImeAction()
-        } else if (AutoApi.serviceType == AutoApi.SERVICE_TYPE_INSTRUMENTATION) {
-            AutoApi.sendKeyCode(KeyEvent.KEYCODE_ENTER)
-        }
-
-    }
-}
-
-suspend fun searchInputNoAndroid24(texts: List<String>) {
-    SF.type("EditText").require(3000).apply {
-        tryClick()
-        this.text = texts[keyInterval]
-//        keyInterval ++
-        SF.text("搜索").require(2000).tryClick()
-    }
-}
-
-// 获取列表帖子
-
-@RequiresApi(Build.VERSION_CODES.N)
-suspend fun getListPost(act: ComponentActivity) {
-    // 寻找列表
-    val matchAll = listOf("^\\d{4}-\\d{2}-\\d{2}$",
-        "^\\d{2}-\\d{2}$",
-        "^\\d+(天|小时|分钟)前$",
-        "^(昨|今)天 \\d{2}:\\d{2}$")
-    var listSG: ConditionGroup = SG()
-
-    matchAll.forEachIndexed { index, regex ->
-        listSG = if (index == 0) {
-            listSG.matchText(regex)
-        } else {
-            listSG.or().matchText(regex)
-        }
-    }
-
-    listSG.require(3000)
-    val list = listSG.findAll()
-    log("搜索结果：${list.size}")
-    list.forEach {
-        log("开始处理[${it.text}]")
-        clickPost(it)
-        delay(500)
-        // 处理链接
-        handleUrl(act)
-        delay(500)
-        log("处理结束[${it.text}]")
-    }
-
-    log("下滑")
-    list.last().swipeOffset(0,-50,300)
-}
-
-suspend fun getListPostNoAndroid24(act: ComponentActivity) {
-    // 寻找列表
-    val matchAll = listOf("^\\d{4}-\\d{2}-\\d{2}$",
-        "^\\d{2}-\\d{2}$",
-        "^\\d+(天|小时|分钟)前$",
-        "^(昨|今)天 \\d{2}:\\d{2}$")
-    var listSG: ConditionGroup = SG()
-
-    matchAll.forEachIndexed { index, regex ->
-        listSG = if (index == 0) {
-            listSG.matchText(regex)
-        } else {
-            listSG.or().matchText(regex)
-        }
-    }
-
-    listSG.require(3000)
-    val list = listSG.findAll()
-    log("搜索结果：${list.size}")
-    list.forEach {
-        log("开始处理[${it.text}]")
-        clickPost(it)
-        delay(500)
-        // 处理链接
-        handleUrlNoAndroid24(act)
-        delay(500)
-        log("处理结束[${it.text}]")
-    }
-
-    log("下滑")
-//    list.last().swipeOffset(0,-50,300)
-    swipe(50, 20, 50, 50, 400)
-
-}
-
-
-// 点击帖子
-suspend fun clickPost(it: ViewNode) {
-    log("点击帖子[${it.text}]")
-    if(it.tryClick()){
-        getPostContent()
-        copyUrl()
-        back()
-    }
-}
-
-// 获取帖子内容
-suspend fun getPostContent(){
-    try {
-        // 作者
-        val author = SF.id("nickNameTV").require(2000).text
-        // 标题
-        val title = SF.id("g9x").require(2000).text
-        // 内容
-        val content = SF.id("dqo").require(2000).text
-
-        log("获取帖子内容:[作者:$author,标题:$title,内容:$content]")
-    }catch (e: Exception){
-        log("获取帖子内容失败", 1)
-    }
-}
-
-// 复制url
-suspend fun copyUrl() {
-
-    try {
-        log("点击分享")
-        if (!SF.desc("分享").require(2000).tryClick()) {
-            log("点击分享失败", 3)
-            return
-        }
-        log("点击复制链接")
-        val copyLink = SF.desc("复制链接").require(2000)
-        if (copyLink.childAt(0)?.click() != true) {
-            if (!copyLink.tryClick()) {
-                log("点击复制链接失败", 3)
-                return
-            }
-        }
-        log("复制链接成功")
-    }catch (e: Exception){
-        log("复制链接失败", 1)
-        return
-    }
-
-}
-
-// 处理复制的url
-suspend fun handleUrl(act: ComponentActivity) {
-    log("开始处理复制链接")
-    switchTask("自动化小红书")
-    val clipboardText = getClipboardText(act)
-    if (clipboardText != null) {
-        log("读取剪切板成功:[$clipboardText]")
-        val link = convertLink(clipboardText)
-        log("处理链接成功:[$link]")
-    } else {
-        log("读取剪切板失败", 2)
-    }
-//    switchTask("小红书")
-    openApp(act, "com.xingin.xhs")
-    log("处理复制链接成功")
-}
-
-suspend fun handleUrlNoAndroid24(act: ComponentActivity) {
-    log("开始处理复制链接")
-//    switchTask("自动化小红书")
-    val clipboardText = getClipboardText(act)
-    if (clipboardText != null) {
-        log("读取剪切板成功:[$clipboardText]")
-        val link = convertLink(clipboardText)
-        log("处理链接成功:[$link]")
-    } else {
-        log("读取剪切板失败", 2)
-    }
-//    switchTask("小红书")
-//    openApp(act, "com.xingin.xhs")
-    log("处理复制链接成功")
-}
-
-
-
-suspend fun switchTask(appName: String){
-    log("切换任务[$appName]")
-    recents()
-    if (!SF.desc("$appName,未加锁").and().type("FrameLayout").require(2000).tryClick()) {
-        log("任务[${appName}]没有开启", 2)
-    }
-    delay(300)
-}
-suspend fun switchTask(appName: String, packageName: String): Boolean {
-    log("切换任务[$appName]")
-    recents()
-    if (!SF.desc("$appName,未加锁").and().type("FrameLayout").require(2000).tryClick()) {
-        log("任务[${appName}]没有开启", 2)
-    }
-    delay(300)
-    return if (waitForApp(packageName, 5000)) {
-        true
-    } else {
-        log("切换任务[${appName}]失败", 2)
-        false
-    }
-}
-
-
-private suspend fun getClipboardText(context: Context): String? {
-    return withContext(Dispatchers.Main) {
-        val clipboardManager =
-            context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
-        clipboardManager?.primaryClip?.getItemAt(0)?.text?.toString()
-    }
-}
-
-private fun convertLink(urlText: String): String? {
-    val pattern = "https?://[a-z.]+/[a-zA-Z0-9]+".toRegex()
-    val matcher = pattern.find(urlText)
-    if (matcher == null) {
-        log("链接格式错误", 2)
-        return null
-    }
-
-    return matcher.value
-}
-
-fun log(msg: String, int: Int = 0) {
-    when (int) {
-        0 -> Timber.tag("AutoRedBook").d(msg)
-        1 -> Timber.tag("AutoRedBook").i(msg)
-        2 -> Timber.tag("AutoRedBook").w(msg)
-        3 -> Timber.tag("AutoRedBook").e(msg)
-        else -> Timber.tag("AutoRedBook").d(msg)
-    }
-}

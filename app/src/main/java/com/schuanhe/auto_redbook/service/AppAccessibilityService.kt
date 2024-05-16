@@ -1,8 +1,9 @@
 package com.schuanhe.auto_redbook.service
 
-import android.util.Log
 import com.schuanhe.andro_auto_api.AccessibilityApi
 import com.schuanhe.auto.core.AppScope
+import com.schuanhe.auto_redbook.DemoApp.Companion.PageUpdate
+import timber.log.Timber
 
 /**
  * # MyAccessibilityService
@@ -29,7 +30,8 @@ class AppAccessibilityService : AccessibilityApi() {
 
     //页面更新回调
     override fun onPageUpdate(currentScope: AppScope) {
-        Log.d(TAG, "onPageUpdate: $currentScope")
+        PageUpdate = currentScope
+        Timber.tag(TAG).d("onPageUpdate: %s", currentScope)
     }
 
     companion object {

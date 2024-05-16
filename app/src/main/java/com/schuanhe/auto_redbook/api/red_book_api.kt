@@ -1,30 +1,16 @@
 package com.schuanhe.auto_redbook.api
 
 
-import android.app.AlertDialog
-import android.content.Context
-import android.content.DialogInterface
+import com.schuanhe.auto.core.api.setScreenSize
+import com.schuanhe.auto.core.api.swipe
 import com.schuanhe.auto.core.viewnode.ViewNode
 
 
 //@RequiresApi(Build.VERSION_CODES.N)
-fun redBookGo(context: Context,includeInvisible: Boolean = true) {
+suspend fun redBookGo(includeInvisible: Boolean = true) {
 
-
-    showNotification(context)
-
-    val builder = AlertDialog.Builder(context)
-    builder.setTitle("提示")
-    builder.setMessage("这是一个对话框的示例")
-    builder.setPositiveButton("确定") { dialogInterface: DialogInterface, i: Int ->
-        // 点击确定按钮的处理逻辑
-//        Toast.makeText(context, "点击了确定按钮", Toast.LENGTH_SHORT).show()
-    }
-    builder.setNegativeButton("取消") { dialogInterface: DialogInterface, i: Int ->
-        // 点击取消按钮的处理逻辑
-//        Toast.makeText(context, "点击了取消按钮", Toast.LENGTH_SHORT).show()
-    }
-    builder.show()
+    setScreenSize(100, 100)
+    swipe(50, 80, 50, 10, 300)
 
 
 //    requireBaseAccessibility()
