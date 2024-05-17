@@ -203,7 +203,7 @@ suspend fun getPostContent() {
 /**
  * 复制url。
  */
-suspend fun copyUrl() {
+suspend fun copyUrl(isOne : Boolean = true) {
     delay(1000)
     log("点击分享")
     if (!SF.desc("分享").require(2000).click()) {
@@ -220,6 +220,8 @@ suspend fun copyUrl() {
         copyLink.tryClick()
     } catch (e: Exception) {
         log("点击复制链接失败", 3)
+        if (isOne)
+            copyUrl(false)
     }
 }
 
@@ -251,7 +253,6 @@ suspend fun handleUrl(act: ComponentActivity) {
  */
 suspend fun handleUrlNoAndroid24(act: ComponentActivity) {
     log("开始处理复制链接")
-//    switchTask("自动化小红书")
     val clipboardText = getClipboardText()
     if (clipboardText != null) {
         log("读取剪切板成功:[$clipboardText]")
@@ -260,8 +261,11 @@ suspend fun handleUrlNoAndroid24(act: ComponentActivity) {
     } else {
         log("读取剪切板失败", 2)
     }
-//    switchTask("小红书")
-//    openApp(act, "com.xingin.xhs")
     log("处理复制链接成功")
 }
+
+
+/**
+ * 链接转换
+ */
 

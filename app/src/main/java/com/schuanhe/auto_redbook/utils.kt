@@ -122,7 +122,8 @@ suspend fun getClipboardText(): String? {
  * @return 返回处理后的链接。
  */
 fun convertLink(urlText: String): String? {
-    val pattern = "https?://[a-z.]+/[a-zA-Z0-9]+/item/[a-zA-Z0-9]+".toRegex()
+//    val pattern = "https?://[a-z.]+/[a-zA-Z0-9]+/item/[a-zA-Z0-9]+".toRegex()
+    val pattern = "https?://[a-zA-Z./0-9]+".toRegex()
     val matcher = pattern.find(urlText)
     if (matcher == null) {
         log("链接格式错误", 2)
