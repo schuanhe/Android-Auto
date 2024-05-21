@@ -20,6 +20,7 @@ import com.schuanhe.auto.core.viewnode.ViewNode
 import com.schuanhe.auto_redbook.convertLink
 import com.schuanhe.auto_redbook.getClipboardText
 import com.schuanhe.auto_redbook.log
+import com.schuanhe.auto_redbook.okhttp
 import com.schuanhe.auto_redbook.switchTask
 import kotlinx.coroutines.delay
 
@@ -120,7 +121,7 @@ suspend fun getListPost(act: ComponentActivity) {
  *
  * @param act 当前活动组件。
  */
-suspend fun getListPostNoAndroid24(act: ComponentActivity) {
+suspend fun getListPostNoAndroid24(act: ComponentActivity, ) {
     // 寻找列表项并匹配时间格式
     val matchAll = listOf(
         "^\\d{4}-\\d{2}-\\d{2}$",
@@ -129,7 +130,6 @@ suspend fun getListPostNoAndroid24(act: ComponentActivity) {
         "^(昨|今)天 \\d{2}:\\d{2}$"
     )
     var listSG: ConditionGroup = SG()
-
     matchAll.forEachIndexed { index, regex ->
         listSG = if (index == 0) {
             listSG.matchText(regex)
@@ -145,13 +145,12 @@ suspend fun getListPostNoAndroid24(act: ComponentActivity) {
     list.forEach {
         log("开始处理[${it.text}]")
         clickPost(it)
-        handleUrlNoAndroid24(act)
         delay(500)
         log("处理结束[${it.text}]")
     }
 
     log("下滑")
-    swipe(50, 80, 50, 10, 300)
+    swipe(50, 90, 50, 5, 100)
 }
 
 /**
@@ -170,12 +169,10 @@ suspend fun clickPost(it: ViewNode) {
     }
     // 判断当前页面
     log("当前页面: ${AutoApi.currentPage}")
-    if (AutoApi.currentPage == "com.xingin.matrix.notedetail.NoteDetailActivity") {
+    while (AutoApi.currentPage != "com.xingin.alioth.search.GlobalSearchActivity"){
+        // 返回
         back()
-        back()
-    }
-    if (AutoApi.currentPage == "as4.j") {
-        back()
+        delay(1000)
     }
 
 }
@@ -205,6 +202,7 @@ suspend fun getPostContent() {
  */
 suspend fun copyUrl(isOne : Boolean = true) {
     delay(1000)
+    try {
     log("点击分享")
     if (!SF.desc("分享").require(2000).click()) {
         log("点击分享失败", 3)
@@ -216,8 +214,8 @@ suspend fun copyUrl(isOne : Boolean = true) {
     if (!copyLink.isClickable()) {
         copyLink = copyLink.childAt(0)!!
     }
-    try {
         copyLink.tryClick()
+        handleUrlNoAndroid24()
     } catch (e: Exception) {
         log("点击复制链接失败", 3)
         if (isOne)
@@ -251,21 +249,37 @@ suspend fun handleUrl(act: ComponentActivity) {
  *
  * @param act 当前活动组件。
  */
-suspend fun handleUrlNoAndroid24(act: ComponentActivity) {
+suspend fun handleUrlNoAndroid24() {
     log("开始处理复制链接")
     val clipboardText = getClipboardText()
     if (clipboardText != null) {
         log("读取剪切板成功:[$clipboardText]")
-        val link = convertLink(clipboardText)
+        var link = convertLink(clipboardText)
+//        link = link?.let { linkToUrl(it) }
         log("处理链接成功:[$link]")
+        link?.let { linkList.add(it) }
     } else {
         log("读取剪切板失败", 2)
     }
     log("处理复制链接成功")
+
 }
 
 
 /**
  * 链接转换
  */
+// TODO: 链接转换(android 不行)
+suspend fun linkToUrl(link: String): String {
+    return if (link.contains("xhslink.com")) {
+        var result = okhttp(link,0,null, mapOf("User-Agent" to "curl/7.71.1", "Accept" to "*/*"));
+        log("链接转返回:[$result]")
+        val pattern = "https?://www.xiaohongshu.com/discovery/item/[a-zA-Z0-9]+".toRegex()
+        result = result?.let { pattern.find(it)?.value }
+        result ?: link
+    }else {
+        link
+    }
+}
+
 

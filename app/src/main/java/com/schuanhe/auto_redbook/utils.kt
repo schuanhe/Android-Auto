@@ -19,10 +19,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import timber.log.Timber
+import java.io.IOException
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /**
  * # utils
@@ -165,4 +176,56 @@ fun log(msg: String, int: Int = 0) {
         3 -> Timber.tag("AutoRedBook").e(msg)
         else -> Timber.tag("AutoRedBook").d(msg)
     }
+}
+
+
+/**
+ * 发起HTTP请求。
+ *
+ * @param url 请求的URL地址。
+ * @param mode 请求模式，0表示GET请求，1表示POST请求。
+ * @param data 请求的数据，仅在POST请求模式下生效。
+ */
+suspend fun okhttp(url: String, mode: Int = 0, data: String? = null, headers: Map<String, String>? = null): String? {
+    val response = suspendCancellableCoroutine<Response> { continuation ->
+        // 构建请求
+        val requestBuilder = Request.Builder().url(url)
+
+        // 根据headers参数设置请求头
+        headers?.forEach { (key, value) ->
+            requestBuilder.addHeader(key, value)
+        }
+
+        // 根据mode设置请求类型和请求体
+        if (mode == 1 && data != null) {
+            val requestBody =
+                data.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+            requestBuilder.post(requestBody)
+        } else {
+            requestBuilder.get()
+        }
+
+        // 构建请求对象
+        val request = requestBuilder.build()
+
+        // 发送异步请求
+        val call = OkHttpClient().newCall(request)
+        call.enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                continuation.resume(response) // 在协程中恢复并传递响应结果
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                continuation.resumeWithException(e) // 在协程中恢复并传递异常
+            }
+        })
+    }
+
+    // 处理响应结果
+    if (response.isSuccessful) {
+        return response.body?.string()
+    } else {
+        log("请求失败，响应码：${response.code}")
+    }
+    return null
 }

@@ -15,7 +15,6 @@ import com.schuanhe.auto_redbook.scheme.RedBook
 var keyInterval = 0
 @RequiresApi(Build.VERSION_CODES.N)
 suspend fun actAutoRedBook(act: ComponentActivity) {
-
     setScreenSize(100, 100)
     val keyString = listOf("自动化", "关键词2", "小红书2")
 
@@ -42,7 +41,7 @@ suspend fun actAutoRedBook(act: ComponentActivity) {
     log("第二列")
     getListPost(act)
 }
-
+var linkList = mutableListOf<String>()
 suspend fun actAutoRedBookNoAndroid24(act: ComponentActivity) {
     setScreenSize(100, 100)
     val keyString = listOf("自动化", "关键词2", "小红书2")
@@ -52,11 +51,17 @@ suspend fun actAutoRedBookNoAndroid24(act: ComponentActivity) {
 
     openScheme(RedBook.xhsSearchWithKeyword(keyString[keyInterval]))
 
+    while (linkList.size <= 10){
+        getListPostNoAndroid24(act)
+    }
+    log("搜索完所有关键词:${linkList}")
 
-    getListPostNoAndroid24(act)
 
-    log("第二列")
-    getListPostNoAndroid24(act)
+
+
+//
+//    log("第二列")
+//    getListPostNoAndroid24(act)
 }
 
 // 打开应用

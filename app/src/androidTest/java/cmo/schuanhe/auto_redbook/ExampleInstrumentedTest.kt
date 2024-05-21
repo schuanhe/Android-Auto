@@ -2,6 +2,7 @@ package com.schuanhe.auto_redbook
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.schuanhe.auto_redbook.api.linkToUrl
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,9 +29,10 @@ class ExampleInstrumentedTest {
     }
 
     @Test
-    fun testConvertLink() {
+    suspend fun testConvertLink() {
         val link = "28 老张聊职场发布了一篇小红书笔记，快来看吧！ 😆 BVosio711OJI6xT 😆 http://xhslink.com/ZxseEI，复制本条信息，打开【小红书】App查看精彩内容！"
-        val convertedLink = convertLink(link)
+        var convertedLink = convertLink(link)
+        convertedLink =convertedLink?.let { linkToUrl(it) }
         println(convertedLink)
         log("$convertedLink")
         assertEquals("http://xhslink.com/ZxseEI", convertedLink)

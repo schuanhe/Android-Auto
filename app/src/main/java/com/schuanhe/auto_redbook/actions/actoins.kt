@@ -84,6 +84,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.Headers
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -196,9 +197,17 @@ class OKHttp : Action() {
         // 使用协程来处理网络请求
         val response = suspendCancellableCoroutine<Response> { continuation ->
             // 构建请求
+
             val request = Request.Builder()
-                .url("http://baidu.com") // 设置请求的URL
+                .url("http://xhslink.com/j5rdJJ") // 设置请求的URL
+//                .addHeader("User-Agent", "curl/7.71.1")
+                .headers(Headers.headersOf(
+                    "User-Agent", "curl/7.71.1"
+                ))
                 .build()
+
+            log("请求头：${request.headers}")
+//            request.headers
 
             // 发送异步请求
             val call = OkHttpClient().newCall(request)
