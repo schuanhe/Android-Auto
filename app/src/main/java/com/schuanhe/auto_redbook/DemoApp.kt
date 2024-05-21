@@ -20,14 +20,16 @@ import timber.log.Timber
 class DemoApp : Application() {
 
     companion object {
-        lateinit var INS: Application
+        lateinit var INS: Application  // app
         lateinit var PageUpdate: AppScope
     }
 
     override fun onCreate() {
         INS = this
+
         super.onCreate()
 
+        Timber.plant(FileLoggingTree())
         if (Timber.treeCount == 0) {
             Timber.plant(Timber.DebugTree())
         }
