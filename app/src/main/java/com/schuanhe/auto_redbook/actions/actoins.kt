@@ -1,13 +1,9 @@
 package com.schuanhe.auto_redbook.actions
 
-import android.annotation.SuppressLint
-import android.content.ClipboardManager
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Path
 import android.graphics.RectF
-import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
 import android.util.Log
@@ -39,7 +35,6 @@ import com.schuanhe.auto.core.api.printLayoutInfo
 import com.schuanhe.auto.core.api.pullNotificationBar
 import com.schuanhe.auto.core.api.quickSettings
 import com.schuanhe.auto.core.api.recents
-import com.schuanhe.auto.core.api.scrollUp
 import com.schuanhe.auto.core.api.setScreenSize
 import com.schuanhe.auto.core.api.waitForApp
 import com.schuanhe.auto.core.api.withId
@@ -66,7 +61,6 @@ import com.schuanhe.auto.core.viewfinder.similarityText
 import com.schuanhe.auto.core.viewfinder.text
 import com.schuanhe.auto.core.viewfinder.textOrDesc
 import com.schuanhe.auto.core.viewfinder.type
-import com.schuanhe.auto.core.viewnode.ViewNode
 import com.schuanhe.auto_redbook.DemoApp
 import com.schuanhe.auto_redbook.DrawableActivity
 import com.schuanhe.auto_redbook.MainActivity
@@ -97,8 +91,8 @@ import kotlin.coroutines.resumeWithException
 /**
  * # actions
  *
- * Created on 2020/6/10
- * @author Vove
+ * Created on 2024/5/22
+ * @author schuanhe
  */
 
 class BaseNavigatorAction : Action() {
@@ -155,36 +149,12 @@ class BaseNavigatorAction : Action() {
     }
 }
 
-class AutoRedBook : Action() {
-    override val name: String
-        get() = "小红书自动化 2版本"
-
-    @RequiresApi(Build.VERSION_CODES.N)
-    override suspend fun run(act: ComponentActivity) {
-//        actAutoRedBook(act)
-//        val url = "xhsdiscover://search/result?keyword=test"
-        val url = "xhsdiscover://item/662b2fea000000001c009fbc"
-
-        // 创建Intent对象
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse(url)
-        }
-
-        // 检查是否有应用能够处理这个Intent
-        if (intent.resolveActivity(act.packageManager) != null) {
-            // 启动对应的Activity
-            act.startActivity(intent)
-        } else {
-
-        }
-    }
-}
 class AutoRedBookNoAndroid24 : Action() {
     override val name: String
         get() = "小红书自动化 2(低于Android 24)"
     @RequiresApi(Build.VERSION_CODES.N)
     override suspend fun run(act: ComponentActivity) {
-        actAutoRedBookNoAndroid24(act)
+        actAutoRedBookNoAndroid24()
     }
 }
 
@@ -235,7 +205,7 @@ class OKHttp : Action() {
 
 }
 
-class showNo : Action() {
+class ShowNo : Action() {
     override val name: String
         get() = "显示通知"
 
@@ -243,205 +213,6 @@ class showNo : Action() {
         showNotification(act)
     }
 
-}
-
-class RedBookGo : Action() {
-    override val name: String
-        get() = "小红书自动化"
-
-    override suspend fun run(act: ComponentActivity) {
-
-        toast("正在打开小红书")
-            delay(1000)
-
-            val targetApp = "com.xingin.xhs"
-            act.startActivity(act.packageManager.getLaunchIntentForPackage(targetApp))
-
-            if (
-                waitForApp(targetApp, 1000).also {
-                    toast("打开小红书 " + if (it) "成功" else "失败")
-                }
-            ) {
-                pickScreenText(act)
-                // 点击帖子
-                delay(1000)
-                clickPostAndCopyLink(act,300,800)
-                // 返回
-                delay(1000)
-                back()
-                // 切换应用
-                switchApp(act, "com.schuanhe.auto_redbook")
-                delay(1000)
-
-                // 到主线再测试剪切板
-                val clipboardText = getClipboardText(act)
-                if (clipboardText != null) {
-                    toast("复制的链接: $clipboardText")
-                } else {
-                    toast("剪贴板为空或者无法获取内容")
-                }
-                switchApp(act, "com.xingin.xhs")
-                delay(1000)
-
-
-                // 点击帖子2
-                clickPostAndCopyLink(act,300,800)
-                delay(1000)
-                back()
-
-                // 切换应用
-                switchApp(act, "com.schuanhe.auto_redbook")
-                delay(1000)
-                // 到主线再测试剪切板
-                val clipboardText2 = getClipboardText(act)
-                if (clipboardText2 != null) {
-                    toast("复制的链接: $clipboardText2")
-                } else {
-                    toast("剪贴板为空或者无法获取内容")
-                }
-                switchApp(act, "com.xingin.xhs")
-                delay(1000)
-
-                // 上划
-                delay(1000)
-                toast("上划")
-                scrollUp()
-//                delay(1000)
-//                clickPostAndCopyLink(act,300,800)
-//                // 返回
-//                delay(1000)
-//                back()
-
-
-            }
-
-//
-//            // 点击搜索
-//            delay(1000)
-//            toast("唤出搜索框")
-//            click(1100,120);
-//            delay(1000)
-//            toast("输入关键词")
-//            input("测试关键词")
-//            delay(1000)
-//            toast("点击搜索")
-//            click(1150,150)
-//            delay(3000)
-//            // 点击帖子
-//            toast("点击帖子")
-//            click(300,800)
-//            delay(3000)
-//            // 点击分享
-//            toast("点击分享")
-//            click(1150,150)
-//            // 点击复制链接
-//            delay(1000)
-//            toast("点击复制链接")
-//            click(600,2400)
-//            delay(2000)
-//        val clipboardText = getClipboardText(act)
-//        if (clipboardText != null) {
-//            toast("复制的链接: $clipboardText")
-//        } else {
-//            toast("剪贴板为空或者无法获取内容")
-//        }
-//        }
-    }
-
-    @SuppressLint("ServiceCast")
-    private suspend fun getClipboardText(context: Context): String? {
-        return withContext(Dispatchers.Main) {
-            val clipboardManager =
-                context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
-            clipboardManager?.primaryClip?.getItemAt(0)?.text?.toString()
-        }
-    }
-
-    // 搜索关键词
-    private suspend fun pickScreenText(act: ComponentActivity) {
-        toast("搜索")
-        click(1100, 120)
-        delay(2000)
-//        toast("输入关键词")
-        input("测试关键词")
-        delay(1000)
-//        toast("点击搜索")
-        click(1150, 150)
-        delay(3000)
-    }
-
-    // 点击帖子并复制链接
-    private suspend fun clickPostAndCopyLink(act: ComponentActivity,x: Int,y: Int){
-        // 点击帖子
-        toast("帖子处理")
-        click(x, y)
-        delay(3000)
-        // 点击分享
-//        toast("点击分享")
-        click(1150, 150)
-        // 点击复制链接
-        delay(1000)
-//        toast("点击复制链接")
-        click(600, 2400)
-        delay(2000)
-    }
-    // 将复制的链接转换为链接
-    private fun convertLink(urlText: String): String? {
-        val pattern = "https?://[a-z.]+/[a-zA-Z0-9]+".toRegex()
-        val matcher = pattern.find(urlText)
-        if (matcher == null) {
-            toast("无法解析链接")
-            return null
-        }
-        print("匹配到的链接: ${matcher.value}")
-        return matcher.value
-    }
-
-    // 切换应用
-    private suspend fun switchApp(act: ComponentActivity, targetApp: String) {
-        toast("正在打开$targetApp")
-        delay(1000)
-        act.startActivity(act.packageManager.getLaunchIntentForPackage(targetApp))
-        waitForApp(targetApp, 1000).also {
-            toast("打开$targetApp " + if (it) "成功" else "失败")
-        }
-    }
-}
-
-private suspend fun input(keyword: String) {
-    val ts = ViewNode.getRoot().findText(0, 0, "", "android.widget.EditText")
-    if (ts != null) {
-        ts.focus()
-        ts.text = keyword
-    } else {
-        println("没有找到android.widget.EditText,请在五秒内手动输入关键词")
-        delay(5000)
-    }
-}
-
-private fun ViewNode.findText(
-    index: Int,
-    dep: Int,
-    textKey: String,
-    byClassName: String
-): ViewNode? {
-    if (isVisibleToUser) {
-        if (text?.contains(textKey) == true || textKey == "") {
-            if (byClassName != "") {
-                if (className == byClassName)
-                    return this
-            } else {
-                return this
-            }
-        }
-    }
-    children.forEachIndexed { i, it ->
-        val foundNode = it?.findText(i, dep + 1, textKey, byClassName)
-        if (foundNode != null) {
-            return foundNode // 如果在子节点中找到了目标，立即返回该节点
-        }
-    }
-    return null // 如果当前节点及其子节点都不包含目标，则返回 null
 }
 
 class PickScreenText : Action() {

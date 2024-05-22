@@ -5,12 +5,12 @@ import android.view.View
 import android.view.accessibility.AccessibilityEvent
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Collections
 
 /**
  * # PageUpdateMonitor
  *
- * @author Vove
+ * @author schuanhe
  * @date 2023/4/25
  */
 

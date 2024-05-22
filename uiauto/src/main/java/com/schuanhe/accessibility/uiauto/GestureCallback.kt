@@ -1,11 +1,9 @@
 package com.schuanhe.accessibility.uiauto
 
-import android.os.RemoteException
-
 /**
  * # GestureCallback
  *
- * @author Vove
+ * @author schuanhe
  * @date 2023/4/26
  */
 fun interface GestureCallback {

@@ -5,7 +5,7 @@ import com.schuanhe.auto.core.viewnode.ViewNode
 /**
  * # ScreenTextFinder
  *
- * @author Vove
+ * @author schuanhe
  * 2018/10/14
  */
 class ScreenTextFinder(

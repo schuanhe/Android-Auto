@@ -23,8 +23,8 @@ import kotlin.math.max
 /**
  * # utils
  *
- * Created on 2020/6/10
- * @author Vove
+ * Created on 2024/5/22
+ * @author schuanhe
  */
 
 

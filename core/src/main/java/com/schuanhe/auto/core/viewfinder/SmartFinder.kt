@@ -1,7 +1,5 @@
 package com.schuanhe.auto.core.viewfinder
 
-import android.view.accessibility.AccessibilityNodeInfo
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import com.schuanhe.auto.core.viewnode.ViewNode
 
 /**
@@ -9,7 +7,7 @@ import com.schuanhe.auto.core.viewnode.ViewNode
  * 高扩展性
  * 多条件搜索
  *
- * @author Vove
+ * @author schuanhe
  * @date 2022/2/15
  */
 fun interface MatchCondition {

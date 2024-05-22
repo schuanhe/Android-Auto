@@ -12,7 +12,7 @@ import com.schuanhe.auto.core.AutoApi
 /**
  * # ScreenAdapter
  *
- * @author Vove
+ * @author schuanhe
  * 2018/9/6
  */
 object ScreenAdapter {

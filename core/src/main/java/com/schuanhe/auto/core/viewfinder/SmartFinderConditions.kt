@@ -10,7 +10,7 @@ import com.schuanhe.auto.core.utils.compareSimilarity
 /**
  * # SmartFinderConditions
  *
- * @author Vove
+ * @author schuanhe
  * @date 2022/2/15
  */
 

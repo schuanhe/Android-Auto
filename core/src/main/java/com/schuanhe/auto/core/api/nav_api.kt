@@ -10,8 +10,8 @@ import kotlin.math.min
 /**
  * # nav_api
  *
- * Created on 2020/6/10
- * @author Vove
+ * Created on 2024/5/22
+ * @author schuanhe
  */
 
 fun back(): Boolean = AutoApi.back()

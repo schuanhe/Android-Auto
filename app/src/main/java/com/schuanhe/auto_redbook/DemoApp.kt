@@ -13,9 +13,9 @@ import timber.log.Timber
  * # DemoApp
  *
  *
- * Created on 2020/6/10
+ * Created on 2024/5/22
  *
- * @author Vove
+ * @author schuanhe
  */
 class DemoApp : Application() {
 

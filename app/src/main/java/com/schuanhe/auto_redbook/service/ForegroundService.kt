@@ -18,8 +18,8 @@ import kotlinx.coroutines.delay
 /**
  * # ForegroundService
  *
- * Created on 2020/6/11
- * @author Vove
+ * Created on 2024/5/22
+ * @author schuanhe
  */
 class ForegroundService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null

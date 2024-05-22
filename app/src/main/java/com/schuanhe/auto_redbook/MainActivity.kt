@@ -9,12 +9,10 @@ import com.schuanhe.andro_auto_api.AccessibilityApi
 import com.schuanhe.auto.core.AutoApi
 import com.schuanhe.auto.core.utils.jumpAccessibilityServiceSettings
 import com.schuanhe.auto_redbook.actions.Action
-import com.schuanhe.auto_redbook.actions.AutoRedBook
 import com.schuanhe.auto_redbook.actions.AutoRedBookNoAndroid24
 import com.schuanhe.auto_redbook.actions.BaseNavigatorAction
 import com.schuanhe.auto_redbook.actions.OKHttp
-import com.schuanhe.auto_redbook.actions.RedBookGo
-import com.schuanhe.auto_redbook.actions.showNo
+import com.schuanhe.auto_redbook.actions.ShowNo
 import com.schuanhe.auto_redbook.api.createNotificationChannel
 import com.schuanhe.auto_redbook.api.showNotification
 import com.schuanhe.auto_redbook.databinding.ActivityMainBinding
@@ -39,13 +37,11 @@ class MainActivity : AppCompatActivity() {
 
         val actions = mutableListOf(
             BaseNavigatorAction(),
-            RedBookGo(),
-            AutoRedBook(),
             AutoRedBookNoAndroid24(),
             OKHttp(),
-            showNo(),
+            ShowNo(),
             object : Action() {
-                override val name = "Stop"
+                override val name = "暂停"
                 override suspend fun run(act: ComponentActivity) {
                     actionJob?.cancel()
                 }

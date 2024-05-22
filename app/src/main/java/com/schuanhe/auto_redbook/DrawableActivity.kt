@@ -10,8 +10,8 @@ import me.panavtec.drawableview.DrawableViewConfig
 /**
  * # DrawableActivity
  *
- * Created on 2020/6/10
- * @author Vove
+ * Created on 2024/5/22
+ * @author schuanhe
  */
 class DrawableActivity : AppCompatActivity() {
 

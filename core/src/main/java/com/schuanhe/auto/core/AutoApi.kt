@@ -20,8 +20,8 @@ import java.lang.reflect.Proxy
 /**
  * # AutoApi
  *
- * Created on 2020/6/10
- * @author Vove
+ * Created on 2024/5/22
+ * @author schuanhe
  */
 
 fun requireAutoService() = requireImpl()

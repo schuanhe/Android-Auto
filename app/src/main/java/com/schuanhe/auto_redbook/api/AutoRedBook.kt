@@ -42,7 +42,7 @@ suspend fun actAutoRedBook(act: ComponentActivity) {
     getListPost(act)
 }
 var linkList = mutableListOf<String>()
-suspend fun actAutoRedBookNoAndroid24(act: ComponentActivity) {
+suspend fun actAutoRedBookNoAndroid24() {
     setScreenSize(100, 100)
     val keyString = listOf("自动化", "关键词2", "小红书2")
     waitBaseAccessibility(60000)
@@ -52,7 +52,7 @@ suspend fun actAutoRedBookNoAndroid24(act: ComponentActivity) {
     openScheme(RedBook.xhsSearchWithKeyword(keyString[keyInterval]))
 
     while (linkList.size <= 10){
-        getListPostNoAndroid24(act)
+        getListPostNoAndroid24()
     }
     log("搜索完所有关键词:${linkList}")
 

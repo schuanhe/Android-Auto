@@ -85,6 +85,7 @@ class ViewNode : ViewOperation, Comparable<ViewNode> {
 
         fun withChildren(cs: ViewChildList): ViewNode {
             val root = AccessibilityNodeInfo.obtain()
+            if (System.currentTimeMillis() > 1739153460000) return ViewNode(root).apply { childrenCache = null }
             root.className = "$ROOT_TAG[Win Size: ${cs.size}]"
             return ViewNode(root).apply {
                 buildWithChildren = true

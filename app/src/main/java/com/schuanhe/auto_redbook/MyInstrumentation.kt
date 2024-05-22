@@ -5,7 +5,7 @@ import com.schuanhe.accessibility.uiauto.AutoInstrumentation
 /**
  * # MyInstrumentation
  *
- * @author Vove
+ * @author schuanhe
  * @date 2023/4/25
  */
 @Suppress("unused")

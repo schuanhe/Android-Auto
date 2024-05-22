@@ -121,7 +121,7 @@ suspend fun getListPost(act: ComponentActivity) {
  *
  * @param act 当前活动组件。
  */
-suspend fun getListPostNoAndroid24(act: ComponentActivity, ) {
+suspend fun getListPostNoAndroid24() {
     // 寻找列表项并匹配时间格式
     val matchAll = listOf(
         "^\\d{4}-\\d{2}-\\d{2}$",
@@ -169,7 +169,7 @@ suspend fun clickPost(it: ViewNode) {
     }
     // 判断当前页面
     log("当前页面: ${AutoApi.currentPage}")
-    while (AutoApi.currentPage != "com.xingin.alioth.search.GlobalSearchActivity"){
+    while (AutoApi.currentPage != "com.xingin.alioth.search.GlobalSearchActivity") {
         // 返回
         back()
         delay(1000)
@@ -200,20 +200,20 @@ suspend fun getPostContent() {
 /**
  * 复制url。
  */
-suspend fun copyUrl(isOne : Boolean = true) {
+suspend fun copyUrl(isOne: Boolean = true) {
     delay(1000)
     try {
-    log("点击分享")
-    if (!SF.desc("分享").require(2000).click()) {
-        log("点击分享失败", 3)
-        return
-    }
-    log("点击复制链接")
-    var copyLink = SF.desc("复制链接").require(3000)
+        log("点击分享")
+        if (!SF.desc("分享").require(2000).click()) {
+            log("点击分享失败", 3)
+            return
+        }
+        log("点击复制链接")
+        var copyLink = SF.desc("复制链接").require(3000)
 
-    if (!copyLink.isClickable()) {
-        copyLink = copyLink.childAt(0)!!
-    }
+        if (!copyLink.isClickable()) {
+            copyLink = copyLink.childAt(0)!!
+        }
         copyLink.tryClick()
         handleUrlNoAndroid24()
     } catch (e: Exception) {
@@ -247,39 +247,41 @@ suspend fun handleUrl(act: ComponentActivity) {
 /**
  * 处理复制的url（兼容Android 24以下版本）。
  *
- * @param act 当前活动组件。
  */
 suspend fun handleUrlNoAndroid24() {
-    log("开始处理复制链接")
     val clipboardText = getClipboardText()
     if (clipboardText != null) {
         log("读取剪切板成功:[$clipboardText]")
-        var link = convertLink(clipboardText)
-//        link = link?.let { linkToUrl(it) }
+        val link = convertLink(clipboardText)
+        if (!linkAuto(link)) {
+            log("链接不对劲:[$link]")
+            return
+        }
         log("处理链接成功:[$link]")
         link?.let { linkList.add(it) }
     } else {
         log("读取剪切板失败", 2)
     }
-    log("处理复制链接成功")
-
 }
 
 
 /**
  * 链接转换
  */
-// TODO: 链接转换(android 不行)
+// 过时
+@Deprecated("不得行哥们")
 suspend fun linkToUrl(link: String): String {
     return if (link.contains("xhslink.com")) {
-        var result = okhttp(link,0,null, mapOf("User-Agent" to "curl/7.71.1", "Accept" to "*/*"));
+        var result = okhttp(link, 0, null, mapOf("User-Agent" to "curl/7.71.1", "Accept" to "*/*"));
         log("链接转返回:[$result]")
         val pattern = "https?://www.xiaohongshu.com/discovery/item/[a-zA-Z0-9]+".toRegex()
         result = result?.let { pattern.find(it)?.value }
         result ?: link
-    }else {
+    } else {
         link
     }
 }
 
-
+suspend fun linkAuto(link: String?): Boolean {
+    return !link.isNullOrEmpty() && link.contains("discovery/item")
+}

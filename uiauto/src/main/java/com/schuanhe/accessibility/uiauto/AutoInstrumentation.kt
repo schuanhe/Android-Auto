@@ -6,9 +6,18 @@ import android.app.UiAutomation
 import android.content.Context
 import android.graphics.Bitmap
 import android.hardware.display.DisplayManager
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
 import android.util.SparseArray
-import android.view.*
+import android.view.Display
+import android.view.InputDevice
+import android.view.InputEvent
+import android.view.KeyCharacterMap
+import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.accessibility.AccessibilityEvent.TYPE_WINDOWS_CHANGED
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityWindowInfo
@@ -20,14 +29,13 @@ import com.schuanhe.auto.core.OnPageUpdate
 import com.schuanhe.auto.core.PageUpdateMonitor
 import com.schuanhe.auto.core.utils.AutoGestureDescription
 import com.schuanhe.auto.core.utils.GestureResultCallback
-import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * # AutoInstrumentation
  *
- * @author Vove
+ * @author schuanhe
  * @date 2023/4/25
  */
 @Suppress("unused")
