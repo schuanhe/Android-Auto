@@ -3,7 +3,6 @@ package com.schuanhe.auto_redbook.api
 import android.os.Build
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
-import androidx.annotation.RequiresApi
 import com.schuanhe.auto.core.AutoApi
 import com.schuanhe.auto.core.AutoApi.Companion.back
 import com.schuanhe.auto.core.api.swipe
@@ -60,49 +59,6 @@ suspend fun searchInput(texts: List<String>) {
             AutoApi.sendKeyCode(KeyEvent.KEYCODE_ENTER)
         }
     }
-}
-
-
-/**
- * 获取列表帖子。
- *
- * @param act 当前活动组件。
- */
-@RequiresApi(Build.VERSION_CODES.N)
-suspend fun getListPost(act: ComponentActivity) {
-    // 定义匹配规则，以适应不同时间格式的帖子列表项
-    val matchAll = listOf(
-        "^\\d{4}-\\d{2}-\\d{2}$",
-        "^\\d{2}-\\d{2}$",
-        "^\\d+(天|小时|分钟)前$",
-        "^(昨|今)天 \\d{2}:\\d{2}$"
-    )
-    var listSG: ConditionGroup = SG()
-
-    // 构建匹配条件
-    matchAll.forEachIndexed { index, regex ->
-        listSG = if (index == 0) {
-            listSG.matchText(regex)
-        } else {
-            listSG.or().matchText(regex)
-        }
-    }
-
-    listSG.require(3000)
-    val list = listSG.findAll()
-    log("搜索结果：${list.size}")
-    // 遍历搜索结果，点击每个帖子并处理链接
-    list.forEach {
-        log("开始处理[${it.text}]")
-        clickPost(it)
-
-        handleUrl(act)
-
-        log("处理结束[${it.text}]")
-    }
-
-    log("下滑")
-    list.last().swipeOffset(0, -50, 300)
 }
 
 /**
