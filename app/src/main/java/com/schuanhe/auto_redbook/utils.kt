@@ -8,7 +8,6 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
 import com.schuanhe.auto.core.api.recents
-import com.schuanhe.auto.core.api.waitForApp
 import com.schuanhe.auto.core.viewfinder.SF
 import com.schuanhe.auto.core.viewfinder.desc
 import com.schuanhe.auto.core.viewfinder.type
@@ -88,28 +87,6 @@ suspend fun switchTask(appName: String){
         log("任务[${appName}]没有开启", 2)
     }
     delay(300)
-}
-
-/**
- * 切换到指定的应用任务，并检查是否成功切换。
- *
- * @param appName 要切换到的应用名称。
- * @param packageName 要切换到的应用的包名。
- * @return 返回是否成功切换到指定应用。
- */
-suspend fun switchTask(appName: String, packageName: String): Boolean {
-    log("切换任务[$appName]")
-    recents()
-    if (!SF.desc("$appName,未加锁").and().type("FrameLayout").require(2000).tryClick()) {
-        log("任务[${appName}]没有开启", 2)
-    }
-    delay(300)
-    return if (waitForApp(packageName, 5000)) {
-        true
-    } else {
-        log("切换任务[${appName}]失败", 2)
-        false
-    }
 }
 
 
@@ -220,6 +197,7 @@ suspend fun okhttp(url: String, mode: Int = 0, data: String? = null, headers: Ma
         })
     }
 
+    log("请求[$url]")
     // 处理响应结果
     if (response.isSuccessful) {
         return response.body?.string()

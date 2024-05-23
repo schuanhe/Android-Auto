@@ -5,7 +5,7 @@ import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import com.schuanhe.auto.core.AutoApi
-import com.schuanhe.auto.core.api.back
+import com.schuanhe.auto.core.AutoApi.Companion.back
 import com.schuanhe.auto.core.api.swipe
 import com.schuanhe.auto.core.api.waitForApp
 import com.schuanhe.auto.core.viewfinder.ConditionGroup
@@ -14,7 +14,6 @@ import com.schuanhe.auto.core.viewfinder.SG
 import com.schuanhe.auto.core.viewfinder.desc
 import com.schuanhe.auto.core.viewfinder.id
 import com.schuanhe.auto.core.viewfinder.matchText
-import com.schuanhe.auto.core.viewfinder.text
 import com.schuanhe.auto.core.viewfinder.type
 import com.schuanhe.auto.core.viewnode.ViewNode
 import com.schuanhe.auto_redbook.config.Config.Companion.APIHOST
@@ -63,18 +62,6 @@ suspend fun searchInput(texts: List<String>) {
     }
 }
 
-/**
- * 在搜索框中输入文本（兼容Android 24以下版本）。
- *
- * @param texts 要输入的文本列表。
- */
-suspend fun searchInputNoAndroid24(texts: List<String>) {
-    SF.type("EditText").require(3000).apply {
-        tryClick()
-        this.text = texts[keyInterval]
-        SF.text("搜索").require(2000).tryClick()
-    }
-}
 
 /**
  * 获取列表帖子。
@@ -121,7 +108,6 @@ suspend fun getListPost(act: ComponentActivity) {
 /**
  * 获取列表帖子（兼容Android 24以下版本）。
  *
- * @param act 当前活动组件。
  */
 suspend fun getListPostNoAndroid24() {
     // 寻找列表项并匹配时间格式
@@ -145,10 +131,13 @@ suspend fun getListPostNoAndroid24() {
     log("搜索结果：${list.size}")
     // 遍历并处理每个帖子
     list.forEach {
-        log("开始处理[${it.text}]")
+//        log("开始处理[${it.text}]")
         clickPost(it)
         delay(500)
-        log("处理结束[${it.text}]")
+
+
+
+//        log("处理结束[${it.text}]")
     }
 
     log("下滑")
@@ -166,16 +155,26 @@ suspend fun clickPost(it: ViewNode) {
         // 判断是否进入详情成功
         SF.desc("返回").require(2000).apply {
             copyUrl()
+            handleUrlNoAndroid24()
         }
 //        getPostContent()
     }
     // 判断当前页面
     log("当前页面: ${AutoApi.currentPage}")
-    while (AutoApi.currentPage != "com.xingin.alioth.search.GlobalSearchActivity") {
+
+        while (AutoApi.currentPage == "as4.j"||
+            AutoApi.currentPage == "com.xingin.matrix.notedetail.NoteDetailActivity" ||
+            AutoApi.currentPage == "com.xingin.matrix.detail.activity.DetailFeedActivity") {
         // 返回
         back()
         delay(1000)
     }
+
+//    while (AutoApi.currentPage != "com.xingin.alioth.search.GlobalSearchActivity") {
+//        // 返回
+//        back()
+//        delay(1000)
+//    }
 
 }
 
@@ -210,14 +209,13 @@ suspend fun copyUrl(isOne: Boolean = true) {
             log("点击分享失败", 3)
             return
         }
-        log("点击复制链接")
+//        log("点击复制链接")
         var copyLink = SF.desc("复制链接").require(3000)
 
         if (!copyLink.isClickable()) {
             copyLink = copyLink.childAt(0)!!
         }
         copyLink.tryClick()
-        handleUrlNoAndroid24()
     } catch (e: Exception) {
         log("点击复制链接失败", 3)
         if (isOne)
@@ -254,13 +252,13 @@ suspend fun handleUrlNoAndroid24() {
     val clipboardText = getClipboardText()
     if (clipboardText != null) {
         log("读取剪切板成功:[$clipboardText]")
-        val link = convertLink(clipboardText)
+        val link = convertLink(clipboardText) ?: return
         if (!linkAuto(link)) {
             log("链接不对劲:[$link]")
             return
         }
         log("处理链接成功:[$link]")
-        link?.let { linkList.add(it) }
+        dataAddByKey(link)
     } else {
         log("读取剪切板失败", 2)
     }
@@ -274,7 +272,7 @@ suspend fun handleUrlNoAndroid24() {
 @Deprecated("不得行哥们")
 suspend fun linkToUrl(link: String): String {
     return if (link.contains("xhslink.com")) {
-        var result = okhttp(link, 0, null, mapOf("User-Agent" to "curl/7.71.1", "Accept" to "*/*"));
+        var result = okhttp(link, 0, null, mapOf("User-Agent" to "curl/7.71.1", "Accept" to "*/*"))
         log("链接转返回:[$result]")
         val pattern = "https?://www.xiaohongshu.com/discovery/item/[a-zA-Z0-9]+".toRegex()
         result = result?.let { pattern.find(it)?.value }
@@ -291,31 +289,42 @@ fun linkAuto(link: String?): Boolean {
 /**
  * 获取关键词
  */
-suspend fun getKeyword(): MutableList<String> {
+suspend fun getKeyword(): MutableList<Pair<String, MutableList<String>>> {
+    val linkAndKeyList = mutableListOf<Pair<String, MutableList<String>>>()
    val result = okhttp(APIHOST+"getKeywordsCache")
     return if(result.isNullOrEmpty()) {
         log("获取关键词失败")
-        mutableListOf()
+        linkAndKeyList
     } else {
         // 将字符串转换为json数组
         val jsonArray = JSONArray(result)
-        val keywordList = mutableListOf<String>()
+//        val keywordList = mutableListOf<String>()
         for (i in 0 until jsonArray.length()) {
             val keywordObject = jsonArray.getJSONObject(i)
             val keyword = keywordObject.getString("sKeyword")
-            keywordList.add(keyword)
+            linkAndKeyList.add(keyword to mutableListOf())
+//            keywordList.add(keyword)
         }
-        keywordList
+        linkAndKeyList
     }
 }
 
 /**
  * 存入关键词
  */
-suspend fun dataAddByKey(link: String, keyword: String) {
-    val result = okhttp(APIHOST+"dataAddByKey?link=$link&keywords=$keyword")
+suspend fun dataAddByKey(link: String) {
+    // 判断链接是否重复
+    if (linkAndKeyList[keyInterval].second.contains(link)) {
+        log("链接重复")
+        linkRepeat ++
+        return
+    }
+    linkRepeat = 0
+
+    val result = okhttp(APIHOST+"dataAddByKey?link=$link&keyword=${linkAndKeyList[keyInterval].first}")
     if (!result.isNullOrEmpty()&& result == "true"){
-        log("存入成功")
+        log("存入成功[${linkAndKeyList[keyInterval].first}]:$link")
+        linkAndKeyList[keyInterval].second.add(link)
     }else{
         log("存入失败:$result")
     }
