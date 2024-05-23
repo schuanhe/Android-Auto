@@ -33,6 +33,8 @@ class FileLoggingTree() : Timber.DebugTree() {
         } catch (e: IOException) {
             Timber.tag("FileLoggingTree").e("文件写入失败: %s", e.message)
         }
+
+         super.log(priority, tag, message, t)
     }
 
     private fun getLogFile(): File {
