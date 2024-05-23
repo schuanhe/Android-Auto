@@ -17,12 +17,14 @@ import com.schuanhe.auto.core.viewfinder.matchText
 import com.schuanhe.auto.core.viewfinder.text
 import com.schuanhe.auto.core.viewfinder.type
 import com.schuanhe.auto.core.viewnode.ViewNode
+import com.schuanhe.auto_redbook.config.Config.Companion.APIHOST
 import com.schuanhe.auto_redbook.convertLink
 import com.schuanhe.auto_redbook.getClipboardText
 import com.schuanhe.auto_redbook.log
 import com.schuanhe.auto_redbook.okhttp
 import com.schuanhe.auto_redbook.switchTask
 import kotlinx.coroutines.delay
+import org.json.JSONArray
 
 /**
  * 启动指定包名的应用。
@@ -282,6 +284,39 @@ suspend fun linkToUrl(link: String): String {
     }
 }
 
-suspend fun linkAuto(link: String?): Boolean {
+fun linkAuto(link: String?): Boolean {
     return !link.isNullOrEmpty() && link.contains("discovery/item")
+}
+
+/**
+ * 获取关键词
+ */
+suspend fun getKeyword(): MutableList<String> {
+   val result = okhttp(APIHOST+"getKeywordsCache")
+    return if(result.isNullOrEmpty()) {
+        log("获取关键词失败")
+        mutableListOf()
+    } else {
+        // 将字符串转换为json数组
+        val jsonArray = JSONArray(result)
+        val keywordList = mutableListOf<String>()
+        for (i in 0 until jsonArray.length()) {
+            val keywordObject = jsonArray.getJSONObject(i)
+            val keyword = keywordObject.getString("sKeyword")
+            keywordList.add(keyword)
+        }
+        keywordList
+    }
+}
+
+/**
+ * 存入关键词
+ */
+suspend fun dataAddByKey(link: String, keyword: String) {
+    val result = okhttp(APIHOST+"dataAddByKey?link=$link&keywords=$keyword")
+    if (!result.isNullOrEmpty()&& result == "true"){
+        log("存入成功")
+    }else{
+        log("存入失败:$result")
+    }
 }

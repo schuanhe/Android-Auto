@@ -42,12 +42,20 @@ suspend fun actAutoRedBook(act: ComponentActivity) {
     getListPost(act)
 }
 var linkList = mutableListOf<String>()
+var keywordList = mutableListOf<String>()
 suspend fun actAutoRedBookNoAndroid24() {
     setScreenSize(100, 100)
+
+    // 获取关键词
+
+    if (keywordList.isEmpty()){
+        keywordList = getKeyword()
+    }
+
     val keyString = listOf("自动化", "关键词2", "小红书2")
     waitBaseAccessibility(60000)
 
-    log("使用Scheme搜索关键词: ${keyString[keyInterval]}")
+    log("使用Scheme搜索关键词: ${keywordList[keyInterval]}")
 
     openScheme(RedBook.xhsSearchWithKeyword(keyString[keyInterval]))
 
@@ -56,12 +64,6 @@ suspend fun actAutoRedBookNoAndroid24() {
     }
     log("搜索完所有关键词:${linkList}")
 
-
-
-
-//
-//    log("第二列")
-//    getListPostNoAndroid24(act)
 }
 
 // 打开应用

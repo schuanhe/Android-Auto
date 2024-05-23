@@ -46,7 +46,6 @@ import com.schuanhe.auto.core.utils.AutoGestureDescription
 import com.schuanhe.auto.core.utils.GestureResultCallback
 import com.schuanhe.auto.core.viewfinder.SF
 import com.schuanhe.auto.core.viewfinder.SG
-import com.schuanhe.auto.core.viewfinder.ScreenTextFinder
 import com.schuanhe.auto.core.viewfinder._desc
 import com.schuanhe.auto.core.viewfinder._text
 import com.schuanhe.auto.core.viewfinder.clickable
@@ -66,6 +65,7 @@ import com.schuanhe.auto_redbook.DrawableActivity
 import com.schuanhe.auto_redbook.MainActivity
 import com.schuanhe.auto_redbook.R
 import com.schuanhe.auto_redbook.api.actAutoRedBookNoAndroid24
+import com.schuanhe.auto_redbook.api.getKeyword
 import com.schuanhe.auto_redbook.api.showNotification
 import com.schuanhe.auto_redbook.log
 import com.schuanhe.auto_redbook.toast
@@ -217,16 +217,15 @@ class ShowNo : Action() {
 
 class PickScreenText : Action() {
     override val name: String
-        get() = "提取屏幕文字"
+        get() = "获取关键词"
 
     override suspend fun run(act: ComponentActivity) {
-        val ts = ScreenTextFinder().find().joinToString("\n\n")
-        withContext(Dispatchers.Main) {
-            AlertDialog.Builder(act).apply {
-                setTitle("提取文字：")
-                setMessage(ts)
-                show()
-            }
+        val keyword = getKeyword()
+
+        if (keyword.isNotEmpty()) {
+            toast("关键词：$keyword")
+        } else {
+            toast("关键词为空")
         }
     }
 }

@@ -12,6 +12,7 @@ import com.schuanhe.auto_redbook.actions.Action
 import com.schuanhe.auto_redbook.actions.AutoRedBookNoAndroid24
 import com.schuanhe.auto_redbook.actions.BaseNavigatorAction
 import com.schuanhe.auto_redbook.actions.OKHttp
+import com.schuanhe.auto_redbook.actions.PickScreenText
 import com.schuanhe.auto_redbook.actions.ShowNo
 import com.schuanhe.auto_redbook.api.createNotificationChannel
 import com.schuanhe.auto_redbook.api.showNotification
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity() {
             AutoRedBookNoAndroid24(),
             OKHttp(),
             ShowNo(),
+            PickScreenText(),
             object : Action() {
                 override val name = "暂停"
                 override suspend fun run(act: ComponentActivity) {
