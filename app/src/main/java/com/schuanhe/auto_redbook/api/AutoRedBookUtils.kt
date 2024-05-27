@@ -13,6 +13,7 @@ import com.schuanhe.auto.core.viewfinder.SG
 import com.schuanhe.auto.core.viewfinder.desc
 import com.schuanhe.auto.core.viewfinder.id
 import com.schuanhe.auto.core.viewfinder.matchText
+import com.schuanhe.auto.core.viewfinder.text
 import com.schuanhe.auto.core.viewfinder.type
 import com.schuanhe.auto.core.viewnode.ViewNode
 import com.schuanhe.auto_redbook.config.Config.Companion.APIHOST
@@ -60,6 +61,23 @@ suspend fun searchInput(texts: List<String>) {
         }
     }
 }
+
+/**
+ * 切换最新列表
+ */
+
+suspend fun switchList() {
+    delay(2000)
+    SF.text("全部bitmap").require(2000).apply {
+        tryClick()
+        delay(1000)
+        SF.text("最新").require(2000).apply {
+            tryClick()
+        }
+    }
+}
+
+
 
 /**
  * 获取列表帖子（兼容Android 24以下版本）。

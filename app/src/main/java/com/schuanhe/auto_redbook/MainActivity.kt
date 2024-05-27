@@ -15,7 +15,6 @@ import com.schuanhe.auto_redbook.actions.OKHttp
 import com.schuanhe.auto_redbook.actions.PickScreenText
 import com.schuanhe.auto_redbook.actions.ShowNo
 import com.schuanhe.auto_redbook.api.createNotificationChannel
-import com.schuanhe.auto_redbook.api.showNotification
 import com.schuanhe.auto_redbook.databinding.ActivityMainBinding
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -34,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         // 导入通知
         createNotificationChannel(this)
         // 显示通知showNotification
-        showNotification(this)
+//        showNotification(this)
 
         val actions = mutableListOf(
             BaseNavigatorAction(),

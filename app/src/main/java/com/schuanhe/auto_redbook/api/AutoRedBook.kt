@@ -5,6 +5,7 @@ import com.schuanhe.auto.core.api.setScreenSize
 import com.schuanhe.auto_redbook.log
 import com.schuanhe.auto_redbook.openScheme
 import com.schuanhe.auto_redbook.scheme.RedBook
+import kotlinx.coroutines.delay
 
 var keyInterval = 0
 var linkAndKeyList = mutableListOf<Pair<String, MutableList<String>>>()
@@ -18,12 +19,17 @@ suspend fun actAutoRedBookNoAndroid24() {
 
     waitBaseAccessibility(60000)
 
-    linkAndKeyList.forEach {
+    linkAndKeyList.forEach { _ ->
         log("使用Scheme搜索关键词: ${linkAndKeyList[keyInterval].first}")
         openScheme(RedBook.xhsSearchWithKeyword(linkAndKeyList[keyInterval].first))
+
+        switchList()
+//        delay(2000)
+        delay(3000)
         while (linkRepeat < 4 && linkAndKeyList[keyInterval].second.size < 100) {
             getListPostNoAndroid24()
         }
+
         log("关键词搜索完成【${linkAndKeyList[keyInterval].first}】【${linkAndKeyList[keyInterval].second.size}】:${linkAndKeyList[keyInterval].second}")
         keyInterval ++
     }
