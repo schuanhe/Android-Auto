@@ -91,29 +91,29 @@ suspend fun getListPostNoAndroid24() {
         "^\\d+(天|小时|分钟)前$",
         "^(昨|今)天 \\d{2}:\\d{2}$"
     )
-    var listSG: ConditionGroup = SG()
-    matchAll.forEachIndexed { index, regex ->
-        listSG = if (index == 0) {
-            listSG.matchText(regex)
-        } else {
-            listSG.or().matchText(regex)
+
+    try {
+        var listSG: ConditionGroup = SG()
+        matchAll.forEachIndexed { index, regex ->
+            listSG = if (index == 0) {
+                listSG.matchText(regex)
+            } else {
+                listSG.or().matchText(regex)
+            }
         }
+
+        listSG.require(4000)
+        val list = listSG.findAll()
+        log("搜索结果：${list.size}")
+        // 遍历并处理每个帖子
+        list.forEach {
+            clickPost(it)
+            delay(500)
+        }
+    }catch (e: Exception){
+        log("获取列表帖子失败:${e.message}")
+        return
     }
-
-    listSG.require(4000)
-    val list = listSG.findAll()
-    log("搜索结果：${list.size}")
-    // 遍历并处理每个帖子
-    list.forEach {
-//        log("开始处理[${it.text}]")
-        clickPost(it)
-        delay(500)
-
-
-
-//        log("处理结束[${it.text}]")
-    }
-
     log("下滑")
     swipe(50, 90, 50, 5, 100)
 }
