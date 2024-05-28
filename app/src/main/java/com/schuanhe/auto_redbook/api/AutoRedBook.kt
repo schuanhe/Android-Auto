@@ -23,7 +23,14 @@ suspend fun actAutoRedBookNoAndroid24() {
         log("使用Scheme搜索关键词: ${linkAndKeyList[keyInterval].first}")
         openScheme(RedBook.xhsSearchWithKeyword(linkAndKeyList[keyInterval].first))
 
-        switchList()
+        try {
+            switchList()
+        }catch (e: Exception){
+            log("切换列表失败", 3)
+            keyInterval ++
+            return
+        }
+
 //        delay(2000)
         delay(3000)
         while (linkRepeat < 4 && linkAndKeyList[keyInterval].second.size < 100) {

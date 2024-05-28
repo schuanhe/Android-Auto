@@ -111,7 +111,8 @@ suspend fun getListPostNoAndroid24() {
             delay(500)
         }
     }catch (e: Exception){
-        log("获取列表帖子失败:${e.message}")
+        linkRepeat ++
+        log("获取列表帖子失败[$linkRepeat]:${e.message}")
         return
     }
     log("下滑")
@@ -136,6 +137,7 @@ suspend fun clickPost(it: ViewNode) {
     // 判断当前页面
     log("当前页面: ${AutoApi.currentPage}")
 
+    var maxBack = 0;
         while (AutoApi.currentPage == "as4.j"||
             AutoApi.currentPage == "com.xingin.matrix.notedetail.NoteDetailActivity" ||
             AutoApi.currentPage == "com.xingin.matrix.detail.activity.DetailFeedActivity") {
@@ -303,3 +305,9 @@ suspend fun dataAddByKey(link: String) {
         log("存入失败:$result")
     }
 }
+
+/**
+ * 清楚后台
+ */
+
+

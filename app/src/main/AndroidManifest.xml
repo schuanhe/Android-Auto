@@ -37,6 +37,7 @@
         </activity>
         <activity android:name=".actions.YourActivity" />
         <activity android:name=".DrawableActivity" />
+        <receiver android:name=".alarm.MyBroadcastReceiver" />
 
         <service
             android:name=".service.AppAccessibilityService"

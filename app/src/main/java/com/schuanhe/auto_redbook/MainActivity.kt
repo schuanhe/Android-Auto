@@ -1,6 +1,10 @@
 package com.schuanhe.auto_redbook
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import androidx.activity.ComponentActivity
@@ -14,6 +18,8 @@ import com.schuanhe.auto_redbook.actions.BaseNavigatorAction
 import com.schuanhe.auto_redbook.actions.OKHttp
 import com.schuanhe.auto_redbook.actions.PickScreenText
 import com.schuanhe.auto_redbook.actions.ShowNo
+import com.schuanhe.auto_redbook.alarm.MyBroadcastReceiver
+import com.schuanhe.auto_redbook.alarm.setDailyAlarm
 import com.schuanhe.auto_redbook.api.createNotificationChannel
 import com.schuanhe.auto_redbook.databinding.ActivityMainBinding
 import kotlinx.coroutines.CancellationException
@@ -21,10 +27,13 @@ import kotlinx.coroutines.Job
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var alarmManager: AlarmManager
+    private lateinit var pendingIntent: PendingIntent
 
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +43,15 @@ class MainActivity : AppCompatActivity() {
         createNotificationChannel(this)
         // 显示通知showNotification
 //        showNotification(this)
+        // 启动定时任务
+
+        // 确保在使用之前初始化 alarmManager
+        alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        val intent = Intent(this, MyBroadcastReceiver::class.java)
+        pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
+        setDailyAlarm(11, 31 , alarmManager, pendingIntent)
 
         val actions = mutableListOf(
             BaseNavigatorAction(),
