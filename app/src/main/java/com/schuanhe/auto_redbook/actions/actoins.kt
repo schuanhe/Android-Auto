@@ -16,10 +16,14 @@ import com.schuanhe.auto.core.api.recents
 import com.schuanhe.auto.core.requireAutoService
 import com.schuanhe.auto_redbook.DemoApp
 import com.schuanhe.auto_redbook.MainActivity
+import com.schuanhe.auto_redbook.alarm.nextAlarmTime
+import com.schuanhe.auto_redbook.alarm.setDailyAlarm
 import com.schuanhe.auto_redbook.api.actAutoRedBookNoAndroid24
 import com.schuanhe.auto_redbook.api.getKeyword
 import com.schuanhe.auto_redbook.api.showNotification
+import com.schuanhe.auto_redbook.config.Config
 import com.schuanhe.auto_redbook.log
+import com.schuanhe.auto_redbook.okhttp
 import com.schuanhe.auto_redbook.toast
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -29,7 +33,11 @@ import okhttp3.Headers
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import org.json.JSONObject
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -101,6 +109,43 @@ class AutoRedBookNoAndroid24 : Action() {
     override suspend fun run(act: ComponentActivity) {
         actAutoRedBookNoAndroid24()
     }
+}
+
+
+class getNextAlarmTime66 : Action() {
+    override val name: String
+        get() = "获取定时任务时间"
+    @RequiresApi(Build.VERSION_CODES.N)
+    override suspend fun run(act: ComponentActivity) {
+        val date = Date(nextAlarmTime)
+        val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        val formattedDate =sdf.format(date)
+        // 在主线程中显示 Toast 消息
+        toast("当前定时任务时间: $formattedDate")
+        log("定时:$formattedDate[$nextAlarmTime]")
+    }
+}
+class SetNextAlarmTime : Action() {
+    override val name: String
+        get() = "重新加载定时任务时间"
+    override suspend fun run(act: ComponentActivity) {
+
+        // 获取
+        val okhttp = okhttp(Config.APIHOST + "getRunTime") ?: return
+        val json = JSONObject(okhttp)
+        val h = json.getInt("h")
+        val m = json.getInt("m")
+
+        setDailyAlarm(h, m)
+
+        val date = Date(nextAlarmTime)
+        val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        val formattedDate =sdf.format(date)
+
+        toast("重新加载定时任务时间: $formattedDate")
+        log("定时:$formattedDate[$nextAlarmTime]")
+    }
+
 }
 
 

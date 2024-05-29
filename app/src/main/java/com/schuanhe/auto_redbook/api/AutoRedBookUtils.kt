@@ -5,6 +5,7 @@ import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import com.schuanhe.auto.core.AutoApi
 import com.schuanhe.auto.core.AutoApi.Companion.back
+import com.schuanhe.auto.core.api.recents
 import com.schuanhe.auto.core.api.swipe
 import com.schuanhe.auto.core.api.waitForApp
 import com.schuanhe.auto.core.viewfinder.ConditionGroup
@@ -309,5 +310,17 @@ suspend fun dataAddByKey(link: String) {
 /**
  * 清楚后台
  */
+
+suspend fun clearBackground() {
+    recents()
+    if (!SF.desc("移除小红书。").and().id("dismiss_task").require(2000).tryClick()) {
+        log("移除小红书失败", 2)
+    }
+    delay(1000)
+    // 点击自动化
+    if (!SF.desc("自动化小红书").and().text("自动化小红书").require(2000).tryClick()) {
+        log("进入后台失败", 2)
+    }
+}
 
 

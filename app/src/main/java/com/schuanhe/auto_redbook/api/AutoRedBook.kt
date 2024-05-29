@@ -43,7 +43,10 @@ suspend fun actAutoRedBookNoAndroid24() {
 
     log("搜索完所有关键词:[$linkAndKeyList]")
 
+    // 清除后台
+    clearBackground()
+    linkAndKeyList = mutableListOf()
+    keyInterval = 0
 
 }
 
-// 打开应用

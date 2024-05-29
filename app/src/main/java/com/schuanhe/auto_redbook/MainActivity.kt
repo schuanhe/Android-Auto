@@ -17,7 +17,9 @@ import com.schuanhe.auto_redbook.actions.AutoRedBookNoAndroid24
 import com.schuanhe.auto_redbook.actions.BaseNavigatorAction
 import com.schuanhe.auto_redbook.actions.OKHttp
 import com.schuanhe.auto_redbook.actions.PickScreenText
+import com.schuanhe.auto_redbook.actions.SetNextAlarmTime
 import com.schuanhe.auto_redbook.actions.ShowNo
+import com.schuanhe.auto_redbook.actions.getNextAlarmTime66
 import com.schuanhe.auto_redbook.alarm.MyBroadcastReceiver
 import com.schuanhe.auto_redbook.alarm.setDailyAlarm
 import com.schuanhe.auto_redbook.api.createNotificationChannel
@@ -26,9 +28,13 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import timber.log.Timber
 
+
 class MainActivity : AppCompatActivity() {
-    private lateinit var alarmManager: AlarmManager
-    private lateinit var pendingIntent: PendingIntent
+
+    companion object {
+        lateinit var alarmManager: AlarmManager
+        lateinit var pendingIntent: PendingIntent
+    }
 
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
@@ -51,11 +57,14 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, MyBroadcastReceiver::class.java)
         pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
-        setDailyAlarm(11, 31 , alarmManager, pendingIntent)
+        // 默认5：00
+        setDailyAlarm(5, 0)
 
         val actions = mutableListOf(
             BaseNavigatorAction(),
             AutoRedBookNoAndroid24(),
+            getNextAlarmTime66(),
+            SetNextAlarmTime(),
             OKHttp(),
             ShowNo(),
             PickScreenText(),
