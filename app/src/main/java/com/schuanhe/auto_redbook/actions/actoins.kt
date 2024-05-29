@@ -16,6 +16,7 @@ import com.schuanhe.auto.core.api.recents
 import com.schuanhe.auto.core.requireAutoService
 import com.schuanhe.auto_redbook.DemoApp
 import com.schuanhe.auto_redbook.MainActivity
+import com.schuanhe.auto_redbook.alarm.MyIntervalHours
 import com.schuanhe.auto_redbook.alarm.nextAlarmTime
 import com.schuanhe.auto_redbook.alarm.setDailyAlarm
 import com.schuanhe.auto_redbook.api.actAutoRedBookNoAndroid24
@@ -118,11 +119,11 @@ class getNextAlarmTime66 : Action() {
     @RequiresApi(Build.VERSION_CODES.N)
     override suspend fun run(act: ComponentActivity) {
         val date = Date(nextAlarmTime)
-        val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        val sdf = SimpleDateFormat("YYYY-MM-dd HH:mm:ss", Locale.getDefault())
         val formattedDate =sdf.format(date)
         // 在主线程中显示 Toast 消息
-        toast("当前定时任务时间: $formattedDate")
-        log("定时:$formattedDate[$nextAlarmTime]")
+        toast("当前定时任务时间: $formattedDate,频率:{$MyIntervalHours}h")
+        log("定时:$formattedDate[$nextAlarmTime],频率:{$MyIntervalHours}h")
     }
 }
 class SetNextAlarmTime : Action() {
@@ -135,15 +136,16 @@ class SetNextAlarmTime : Action() {
         val json = JSONObject(okhttp)
         val h = json.getInt("h")
         val m = json.getInt("m")
+        val iN = json.getInt("iN")
 
-        setDailyAlarm(h, m)
+        setDailyAlarm(h, m, iN)
 
         val date = Date(nextAlarmTime)
-        val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        val sdf = SimpleDateFormat("YYYY-MM-dd HH:mm:ss", Locale.getDefault())
         val formattedDate =sdf.format(date)
 
-        toast("重新加载定时任务时间: $formattedDate")
-        log("定时:$formattedDate[$nextAlarmTime]")
+        toast("重新加载定时任务时间: $formattedDate,频率:{$MyIntervalHours}h")
+        log("定时:$formattedDate[$nextAlarmTime],频率:{$MyIntervalHours}h")
     }
 
 }

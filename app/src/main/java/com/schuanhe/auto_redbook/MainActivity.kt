@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
         // 默认5：00
-        setDailyAlarm(5, 0)
+        setDailyAlarm(5, 0, 3)
 
         val actions = mutableListOf(
             AutoRedBookNoAndroid24(),

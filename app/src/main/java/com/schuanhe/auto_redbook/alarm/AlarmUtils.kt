@@ -21,6 +21,8 @@ import java.util.Locale
 
 // 下次 定时任务时间
 public var nextAlarmTime: Long = 0
+// 频率
+public var MyIntervalHours: Int = 0
 
 
 /**
@@ -30,27 +32,31 @@ public var nextAlarmTime: Long = 0
  * @param alarmManager AlarmManager 对象
  * @param pendingIntent PendingIntent 对象
  */
-public fun setDailyAlarm(hour: Int, minute: Int) {
+public fun setDailyAlarm(hour: Int, minute: Int, intervalHours: Int = 24) {
     val calendar = Calendar.getInstance().apply {
         set(Calendar.HOUR_OF_DAY, hour)
         set(Calendar.MINUTE, minute)
         set(Calendar.SECOND, 0)
     }
 
-    // 如果设置的时间已经过去，设定为第二天
+    // 如果设置的时间已经过去，设定为下一个间隔的时间
     if (calendar.timeInMillis < System.currentTimeMillis()) {
-        calendar.add(Calendar.DAY_OF_YEAR, 1)
+        while (calendar.timeInMillis < System.currentTimeMillis()) {
+            calendar.add(Calendar.HOUR_OF_DAY, intervalHours)
+        }
     }
 
     nextAlarmTime = calendar.timeInMillis
+    MyIntervalHours = intervalHours
 
     alarmManager.setInexactRepeating(
         AlarmManager.RTC_WAKEUP,
         calendar.timeInMillis,
-        AlarmManager.INTERVAL_DAY,
+        intervalHours * AlarmManager.INTERVAL_HOUR,
         pendingIntent
     )
 }
+
 
 /**
  * 取消定时任务
