@@ -14,11 +14,8 @@ import com.schuanhe.auto.core.AutoApi
 import com.schuanhe.auto.core.utils.jumpAccessibilityServiceSettings
 import com.schuanhe.auto_redbook.actions.Action
 import com.schuanhe.auto_redbook.actions.AutoRedBookNoAndroid24
-import com.schuanhe.auto_redbook.actions.BaseNavigatorAction
-import com.schuanhe.auto_redbook.actions.OKHttp
 import com.schuanhe.auto_redbook.actions.PickScreenText
 import com.schuanhe.auto_redbook.actions.SetNextAlarmTime
-import com.schuanhe.auto_redbook.actions.ShowNo
 import com.schuanhe.auto_redbook.actions.getNextAlarmTime66
 import com.schuanhe.auto_redbook.alarm.MyBroadcastReceiver
 import com.schuanhe.auto_redbook.alarm.setDailyAlarm
@@ -61,12 +58,9 @@ class MainActivity : AppCompatActivity() {
         setDailyAlarm(5, 0)
 
         val actions = mutableListOf(
-            BaseNavigatorAction(),
             AutoRedBookNoAndroid24(),
             getNextAlarmTime66(),
             SetNextAlarmTime(),
-            OKHttp(),
-            ShowNo(),
             PickScreenText(),
             object : Action() {
                 override val name = "暂停"

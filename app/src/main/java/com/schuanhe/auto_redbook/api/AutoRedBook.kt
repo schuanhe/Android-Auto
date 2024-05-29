@@ -19,27 +19,32 @@ suspend fun actAutoRedBookNoAndroid24() {
 
     waitBaseAccessibility(60000)
 
-    linkAndKeyList.forEach { _ ->
-        log("使用Scheme搜索关键词: ${linkAndKeyList[keyInterval].first}")
-        openScheme(RedBook.xhsSearchWithKeyword(linkAndKeyList[keyInterval].first))
+    try {
+        linkAndKeyList.forEach { _ ->
+            log("使用Scheme搜索关键词: ${linkAndKeyList[keyInterval].first}")
+            openScheme(RedBook.xhsSearchWithKeyword(linkAndKeyList[keyInterval].first))
 
-        try {
-            switchList()
-        }catch (e: Exception){
-            log("切换列表失败", 3)
-            keyInterval ++
-            return
-        }
+            try {
+                switchList()
+            }catch (e: Exception){
+                log("切换列表失败", 3)
+                keyInterval ++
+                return
+            }
 
 //        delay(2000)
-        delay(3000)
-        while (linkRepeat < 4 && linkAndKeyList[keyInterval].second.size < 100) {
-            getListPostNoAndroid24()
-        }
+            delay(3000)
+            while (linkRepeat < 4 && linkAndKeyList[keyInterval].second.size < 100) {
+                getListPostNoAndroid24()
+            }
 
-        log("关键词搜索完成【${linkAndKeyList[keyInterval].first}】【${linkAndKeyList[keyInterval].second.size}】:${linkAndKeyList[keyInterval].second}")
-        keyInterval ++
+            log("关键词搜索完成【${linkAndKeyList[keyInterval].first}】【${linkAndKeyList[keyInterval].second.size}】:${linkAndKeyList[keyInterval].second}")
+            keyInterval ++
+        }
+    }catch (e: Exception){
+        log("搜索关键词失败![{$e}]", 3)
     }
+
 
     log("搜索完所有关键词:[$linkAndKeyList]")
 
