@@ -13,9 +13,14 @@ var linkRepeat = 0
 suspend fun actAutoRedBookNoAndroid24() {
     setScreenSize(100, 100)
 
-    if (linkAndKeyList.isEmpty()){
-        linkAndKeyList = getKeyword()
+    try {
+        if (linkAndKeyList.isEmpty()){
+            linkAndKeyList = getKeyword()
+        }
+    }catch (e: Exception){
+        log("获取关键词失败", 3)
     }
+
 
     waitBaseAccessibility(60000)
 

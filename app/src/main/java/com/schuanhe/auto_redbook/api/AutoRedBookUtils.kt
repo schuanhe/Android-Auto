@@ -313,14 +313,23 @@ suspend fun dataAddByKey(link: String) {
 
 suspend fun clearBackground() {
     recents()
-    if (!SF.desc("移除小红书。").and().id("dismiss_task").require(2000).tryClick()) {
+
+    try {
+        SF.desc("移除小红书。").and().id("dismiss_task").require(2000).tryClick()
+    }catch (e: Exception){
         log("移除小红书失败", 2)
     }
+
+
     delay(1000)
     // 点击自动化
-    if (!SF.desc("自动化小红书").and().text("自动化小红书").require(2000).tryClick()) {
-        log("进入后台失败", 2)
+
+    try {
+        SF.desc("自动化小红书").and().text("自动化小红书").require(2000).tryClick()
+    }catch (e: Exception){
+        log("点击自动化小红书失败", 2)
     }
+
 }
 
 
