@@ -29,7 +29,6 @@ suspend fun actAutoRedBookNoAndroid24() {
             }catch (e: Exception){
                 log("切换列表失败", 3)
                 keyInterval ++
-                return
             }
 
 //        delay(2000)
@@ -40,6 +39,7 @@ suspend fun actAutoRedBookNoAndroid24() {
 
             log("关键词搜索完成【${linkAndKeyList[keyInterval].first}】【${linkAndKeyList[keyInterval].second.size}】:${linkAndKeyList[keyInterval].second}")
             keyInterval ++
+            linkRepeat = 0
         }
     }catch (e: Exception){
         log("搜索关键词失败![{$e}]", 3)
@@ -50,6 +50,7 @@ suspend fun actAutoRedBookNoAndroid24() {
 
     // 清除后台
     clearBackground()
+    linkRepeat = 0
     linkAndKeyList = mutableListOf()
     keyInterval = 0
 
