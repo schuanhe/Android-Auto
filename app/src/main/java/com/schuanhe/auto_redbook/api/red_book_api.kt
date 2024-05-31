@@ -3,7 +3,6 @@ package com.schuanhe.auto_redbook.api
 import com.schuanhe.auto_redbook.log
 import java.lang.reflect.Method
 
-
 suspend fun redBookGo(includeInvisible: Boolean = true) {
 
 

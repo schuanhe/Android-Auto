@@ -188,16 +188,17 @@ suspend fun okhttp(url: String, mode: Int = 0, data: String? = null, headers: Ma
         val call = OkHttpClient().newCall(request)
         call.enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
+                log("请求[$url]")
                 continuation.resume(response) // 在协程中恢复并传递响应结果
             }
 
             override fun onFailure(call: Call, e: IOException) {
+                log("请求失败[$url]，异常：${e.message}")  // 增加日志
                 continuation.resumeWithException(e) // 在协程中恢复并传递异常
             }
         })
     }
 
-    log("请求[$url]")
     // 处理响应结果
     if (response.isSuccessful) {
         return response.body?.string()

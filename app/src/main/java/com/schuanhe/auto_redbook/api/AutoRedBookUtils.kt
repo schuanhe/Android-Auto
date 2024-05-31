@@ -23,8 +23,11 @@ import com.schuanhe.auto_redbook.getClipboardText
 import com.schuanhe.auto_redbook.log
 import com.schuanhe.auto_redbook.okhttp
 import com.schuanhe.auto_redbook.switchTask
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
+import java.net.URLEncoder
 
 /**
  * 启动指定包名的应用。
@@ -68,7 +71,7 @@ suspend fun searchInput(texts: List<String>) {
  */
 
 suspend fun switchList() {
-    delay(2000)
+    delay(3000)
     SF.text("全部bitmap").require(2000).apply {
         tryClick()
         delay(1000)
@@ -298,7 +301,11 @@ suspend fun dataAddByKey(link: String) {
     }
     linkRepeat = 0
 
-    val result = okhttp(APIHOST+"dataAddByKey?link=$link&keyword=${linkAndKeyList[keyInterval].first}")
+    val encodedUrl = withContext(Dispatchers.IO) {
+        URLEncoder.encode(linkAndKeyList[keyInterval].first, "UTF-8")
+    }
+
+    val result = okhttp(APIHOST+"dataAddByKey?link=$link&keyword=${encodedUrl}")
     if (!result.isNullOrEmpty()&& result == "true"){
         log("存入成功[${linkAndKeyList[keyInterval].first}]:$link")
         linkAndKeyList[keyInterval].second.add(link)
@@ -312,9 +319,8 @@ suspend fun dataAddByKey(link: String) {
  */
 
 suspend fun clearBackground() {
-    recents()
-
     try {
+        recents()
         SF.desc("移除小红书。").and().id("dismiss_task").require(2000).tryClick()
     }catch (e: Exception){
         log("移除小红书失败", 2)
