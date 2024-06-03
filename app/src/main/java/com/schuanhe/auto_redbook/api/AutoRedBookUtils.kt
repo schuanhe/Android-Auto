@@ -266,11 +266,12 @@ fun linkAuto(link: String?): Boolean {
     return !link.isNullOrEmpty() && link.contains("discovery/item")
 }
 
+
 /**
  * 获取关键词
  */
-suspend fun getKeyword(): MutableList<Pair<String, MutableList<String>>> {
-    val linkAndKeyList = mutableListOf<Pair<String, MutableList<String>>>()
+suspend fun getKeyword(): MutableList<Pair<Triple<String,Long,Int>, MutableList<String>>> {
+    val linkAndKeyList = mutableListOf<Pair<Triple<String,Long,Int>, MutableList<String>>>()
    val result = okhttp(APIHOST+"getKeywordsCache")
     return if(result.isNullOrEmpty()) {
         log("获取关键词失败")
@@ -282,8 +283,10 @@ suspend fun getKeyword(): MutableList<Pair<String, MutableList<String>>> {
         for (i in 0 until jsonArray.length()) {
             val keywordObject = jsonArray.getJSONObject(i)
             val keyword = keywordObject.getString("sKeyword")
-            linkAndKeyList.add(keyword to mutableListOf())
-//            keywordList.add(keyword)
+            val iLastUpdateTime = keywordObject.getString("iLastUpdateTime")
+            val iCount = keywordObject.getInt("iCount")
+            val keyInFo = Triple(keyword,iLastUpdateTime.toLong(),iCount)
+            linkAndKeyList.add(keyInFo to mutableListOf())
         }
         linkAndKeyList
     }
@@ -299,10 +302,20 @@ suspend fun dataAddByKey(link: String) {
         linkRepeat ++
         return
     }
+
+    // 判断链接是否超时
+    val time = getLinkTime(link)
+    if (time < linkAndKeyList[keyInterval].first.second.toInt()){
+        log("链接超时")
+        linkTimeout = true
+        return
+    }
+
+
     linkRepeat = 0
 
     val encodedUrl = withContext(Dispatchers.IO) {
-        URLEncoder.encode(linkAndKeyList[keyInterval].first, "UTF-8")
+        URLEncoder.encode(linkAndKeyList[keyInterval].first.first, "UTF-8")
     }
 
     val result = okhttp(APIHOST+"dataAddByKey?link=$link&keyword=${encodedUrl}")
@@ -336,6 +349,25 @@ suspend fun clearBackground() {
         log("点击自动化小红书失败", 2)
     }
 
+}
+
+/**
+ * 小红书提取链接时间
+ */
+
+fun getLinkTime(link: String): Int {
+    val pattern = "https?://www.xiaohongshu.com/discovery/item/([a-zA-Z0-9]{8})".toRegex()
+    if (pattern.matches(link)) {
+        val matchResult = pattern.find(link)
+        if (matchResult != null) {
+            val itemID = matchResult.groupValues[1]
+            // 获取时间戳并转换为Long类型
+            return itemID.toInt(16)
+        }
+    } else {
+        log("链接格式错误")
+    }
+    return 0
 }
 
 

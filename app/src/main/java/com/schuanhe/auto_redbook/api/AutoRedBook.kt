@@ -13,8 +13,15 @@ import timber.log.Timber
 import java.net.URLEncoder
 
 var keyInterval = 0
-var linkAndKeyList = mutableListOf<Pair<String, MutableList<String>>>()
+//var linkAndKeyList = mutableListOf<Pair<String, MutableList<String>>>()
+
+var linkAndKeyList = mutableListOf<Pair<Triple<String,Long,Int>, MutableList<String>>>()
+
+// 链接重复次数
 var linkRepeat = 0
+
+// 链接超时
+var linkTimeout = false
 suspend fun actAutoRedBookNoAndroid24() {
     setScreenSize(100, 100)
 
@@ -27,18 +34,13 @@ suspend fun actAutoRedBookNoAndroid24() {
     } catch (e: Exception) {
         log("获取关键词失败", 3)
     }
-
-
     waitBaseAccessibility(60000)
-
     try {
         linkAndKeyList.forEach { _ ->
             try {
                 log("使用Scheme搜索关键词: ${linkAndKeyList[keyInterval].first}")
-
-
                 val encodedUrl = withContext(Dispatchers.IO) {
-                    URLEncoder.encode(linkAndKeyList[keyInterval].first, "UTF-8")
+                    URLEncoder.encode(linkAndKeyList[keyInterval].first.first, "UTF-8")
                 }
 
                 openScheme(RedBook.xhsSearchWithKeyword(encodedUrl))
@@ -51,7 +53,7 @@ suspend fun actAutoRedBookNoAndroid24() {
 
 //        delay(2000)
                 delay(3000)
-                while (linkRepeat < 4 && linkAndKeyList[keyInterval].second.size < 100) {
+                while (linkRepeat < 4 && linkAndKeyList[keyInterval].second.size < linkAndKeyList[keyInterval].first.second) {
                     getListPostNoAndroid24()
                 }
             } catch (e: Exception) {
