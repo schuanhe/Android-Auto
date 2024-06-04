@@ -82,7 +82,6 @@ suspend fun switchList() {
 }
 
 
-
 /**
  * 获取列表帖子（兼容Android 24以下版本）。
  *
@@ -114,8 +113,8 @@ suspend fun getListPostNoAndroid24() {
             clickPost(it)
             delay(500)
         }
-    }catch (e: Exception){
-        linkRepeat ++
+    } catch (e: Exception) {
+        linkRepeat++
         log("获取列表帖子失败[$linkRepeat]:${e.message}")
         return
     }
@@ -142,9 +141,10 @@ suspend fun clickPost(it: ViewNode) {
     log("当前页面: ${AutoApi.currentPage}")
 
     var maxBack = 0;
-        while (AutoApi.currentPage == "as4.j"||
-            AutoApi.currentPage == "com.xingin.matrix.notedetail.NoteDetailActivity" ||
-            AutoApi.currentPage == "com.xingin.matrix.detail.activity.DetailFeedActivity") {
+    while (AutoApi.currentPage == "as4.j" ||
+        AutoApi.currentPage == "com.xingin.matrix.notedetail.NoteDetailActivity" ||
+        AutoApi.currentPage == "com.xingin.matrix.detail.activity.DetailFeedActivity"
+    ) {
         // 返回
         back()
         delay(1000)
@@ -270,10 +270,10 @@ fun linkAuto(link: String?): Boolean {
 /**
  * 获取关键词
  */
-suspend fun getKeyword(): MutableList<Pair<Triple<String,Long,Int>, MutableList<String>>> {
-    val linkAndKeyList = mutableListOf<Pair<Triple<String,Long,Int>, MutableList<String>>>()
-   val result = okhttp(APIHOST+"getKeywordsCache")
-    return if(result.isNullOrEmpty()) {
+suspend fun getKeyword(): MutableList<Pair<Triple<String, Long, Int>, MutableList<String>>> {
+    val linkAndKeyList = mutableListOf<Pair<Triple<String, Long, Int>, MutableList<String>>>()
+    val result = okhttp(APIHOST + "getKeywordsCache")
+    return if (result.isNullOrEmpty()) {
         log("获取关键词失败")
         linkAndKeyList
     } else {
@@ -285,7 +285,7 @@ suspend fun getKeyword(): MutableList<Pair<Triple<String,Long,Int>, MutableList<
             val keyword = keywordObject.getString("sKeyword")
             val iLastUpdateTime = keywordObject.getString("iLastUpdateTime")
             val iCount = keywordObject.getInt("iCount")
-            val keyInFo = Triple(keyword,iLastUpdateTime.toLong(),iCount)
+            val keyInFo = Triple(keyword, iLastUpdateTime.toLong(), iCount)
             linkAndKeyList.add(keyInFo to mutableListOf())
         }
         linkAndKeyList
@@ -299,15 +299,23 @@ suspend fun dataAddByKey(link: String) {
     // 判断链接是否重复
     if (linkAndKeyList[keyInterval].second.contains(link)) {
         log("链接重复")
-        linkRepeat ++
+        linkRepeat++
         return
     }
 
     // 判断链接是否超时
     val time = getLinkTime(link)
-    if (time < linkAndKeyList[keyInterval].first.second.toInt()){
+
+    log("链接时间:$time")
+
+    if (time < linkAndKeyList[keyInterval].first.second) {
         log("链接超时")
         linkTimeout = true
+        return
+    }
+
+    if (linkAndKeyList[keyInterval].second.size >= linkAndKeyList[keyInterval].first.third){
+        log("链接已满:需要\\实际：${linkAndKeyList[keyInterval].first.third}\\${linkAndKeyList[keyInterval].second.size}")
         return
     }
 
@@ -318,11 +326,11 @@ suspend fun dataAddByKey(link: String) {
         URLEncoder.encode(linkAndKeyList[keyInterval].first.first, "UTF-8")
     }
 
-    val result = okhttp(APIHOST+"dataAddByKey?link=$link&keyword=${encodedUrl}")
-    if (!result.isNullOrEmpty()&& result == "true"){
+    val result = okhttp(APIHOST + "dataAddByKey?link=$link&keyword=${encodedUrl}")
+    if (!result.isNullOrEmpty() && result == "true") {
         log("存入成功[${linkAndKeyList[keyInterval].first}]:$link")
         linkAndKeyList[keyInterval].second.add(link)
-    }else{
+    } else {
         log("存入失败:$result")
     }
 }
@@ -335,7 +343,7 @@ suspend fun clearBackground() {
     try {
         recents()
         SF.desc("移除小红书。").and().id("dismiss_task").require(2000).tryClick()
-    }catch (e: Exception){
+    } catch (e: Exception) {
         log("移除小红书失败", 2)
     }
 
@@ -345,7 +353,7 @@ suspend fun clearBackground() {
 
     try {
         SF.desc("自动化小红书").and().text("自动化小红书").require(2000).tryClick()
-    }catch (e: Exception){
+    } catch (e: Exception) {
         log("点击自动化小红书失败", 2)
     }
 
@@ -355,19 +363,18 @@ suspend fun clearBackground() {
  * 小红书提取链接时间
  */
 
-fun getLinkTime(link: String): Int {
-    val pattern = "https?://www.xiaohongshu.com/discovery/item/([a-zA-Z0-9]{8})".toRegex()
-    if (pattern.matches(link)) {
-        val matchResult = pattern.find(link)
-        if (matchResult != null) {
-            val itemID = matchResult.groupValues[1]
-            // 获取时间戳并转换为Long类型
-            return itemID.toInt(16)
-        }
-    } else {
-        log("链接格式错误")
+fun getLinkTime(link: String): Long {
+    val pattern = "https?://www.xiaohongshu.com/discovery/item/([a-zA-Z0-9]{8})\\S+".toRegex()
+
+    val matchResult = pattern.find(link)
+    if (matchResult != null) {
+        val itemID = matchResult.groupValues[1]
+        // 获取时间戳并转换为Long类型
+        return itemID.toLong(16)
     }
-    return 0
+    log("链接格式错误2")
+
+    return 0L
 }
 
 

@@ -53,7 +53,7 @@ suspend fun actAutoRedBookNoAndroid24() {
 
 //        delay(2000)
                 delay(3000)
-                while (linkRepeat < 4 && linkAndKeyList[keyInterval].second.size < linkAndKeyList[keyInterval].first.second) {
+                while (linkRepeat < 4 && linkAndKeyList[keyInterval].second.size < linkAndKeyList[keyInterval].first.third && !linkTimeout) {
                     getListPostNoAndroid24()
                 }
             } catch (e: Exception) {
@@ -62,6 +62,7 @@ suspend fun actAutoRedBookNoAndroid24() {
                 log("关键词搜索完成【${linkAndKeyList[keyInterval].first}】【${linkAndKeyList[keyInterval].second.size}】:${linkAndKeyList[keyInterval].second}")
                 keyInterval++
                 linkRepeat = 0
+                linkTimeout = false
             }
         }
     } catch (e: Exception) {
@@ -76,6 +77,7 @@ suspend fun actAutoRedBookNoAndroid24() {
     linkRepeat = 0
     linkAndKeyList = mutableListOf()
     keyInterval = 0
+    linkTimeout = false
 
 
 }
